@@ -9,6 +9,7 @@ mg.canvas = (function() {
   
   /* Module Settings & Events */
   let settings = {
+    dpi     : 192, // 192, 288
     fps     : 60,
     app     : {
       id_tray   : 'mg-main',
@@ -37,7 +38,7 @@ mg.canvas = (function() {
     },
   }
   /* Memory */
-  let main, canvas, ctx, stageX = 0, stageY = 0;
+  let main, canvas, ctx, sf = 1, stageX = 0, stageY = 0;
   /* Computational variables */
 
   
@@ -72,7 +73,7 @@ mg.canvas = (function() {
   let initialise = function() {
     // set up main
     main = qset( `#${settings.app.id_tray}` )
-    
+
 // document.querySelector('body').addEventListener( events.incoming.stage_start, (e) => { console.log(e)} )
     eventify()
   }
@@ -90,6 +91,13 @@ mg.canvas = (function() {
     
     canvas = qset(`#${settings.canvas.id}`)
     ctx    = canvas.getContext('2d')
+
+    var wi = window.innerWidth
+    var he = window.innerHeight
+    canvas.style.width = wi + 'px'
+    canvas.style.height = he + 'px'
+
+    adjustDPI()
     
     // listen to canvas
     canvas.addEventListener( events.internal.canvas_mousemove, stageMove)
@@ -102,6 +110,31 @@ mg.canvas = (function() {
     
     // start the loop
     anim.prep()
+  }
+
+  // DPI
+  let adjustDPI = function() {
+    // CSS Size
+    canvas.style.width  = canvas.style.width  || canvas.width  + 'px'
+    canvas.style.height = canvas.style.height || canvas.height + 'px'
+
+    // Scale
+    sf = settings.dpi / 96
+
+    var w = parseFloat( canvas.style.width )
+    var h = parseFloat( canvas.style.height )
+
+    var os = canvas.width / w 
+    var bs = sf / os
+    var b  = canvas.cloneNode(false)
+    b.getContext('2d').drawImage(canvas, 0, 0)
+
+    canvas.width = Math.ceil( w * sf )
+    canvas.height = Math.ceil( h * sf )
+
+    ctx.setTransform( bs, 0, 0, bs, 0, 0 ) 
+    ctx.drawImage( b, 0, 0 )
+    ctx.setTransform( sf, 0, 0, sf, 0, 0 )
   }
   
   let stageMove = function(e) {
@@ -116,7 +149,7 @@ mg.canvas = (function() {
     let w = 156
     let h = 294
     let r = h/w
-    let t = 18
+    let t = 25
     
   let tick = function(e) {
     // Notify the modules
@@ -130,7 +163,7 @@ mg.canvas = (function() {
     // Draw the hero
     let m = engine.data()
     ctx.save()
-    ctx.translate( canvas.width/2, canvas.height/2 )
+    ctx.translate( canvas.width/4, canvas.height/4 )
     ctx.rotate( m.hero.rotation )
     ctx.translate( -t/2, -t*r/2 )
     ctx.drawImage( hero, 0, 0, t, t*r )

@@ -115,7 +115,7 @@ mg.css = (function() {
     
     /* Canvas */
     #mg-canvas {
-      
+
     }
     #${settings.id.canvas_id_xy} {
       padding-left  : 1.1vmin;
