@@ -53,6 +53,8 @@ mg.ux = (function() {
       container_subwipe: 'mgu-subwipe',
     },
     outgoing: {
+      injected_main    : `mgu-injected-main`,
+      
       stage_start      : 'mgu-stage-start',
       state_change     : 'mgu-state-change',
       
@@ -90,6 +92,8 @@ mg.ux = (function() {
     main  = qset( `#${settings.app.id_tray}` )
     showX = qset( `#${settings.canvas.id_xy}-X-value`)
     showY = qset( `#${settings.canvas.id_xy}-Y-value`)
+    // inform modules
+    raiseEvent( body, events.outgoing.injected_main )
     
     // add listeners
     listen()

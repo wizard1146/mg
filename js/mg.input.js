@@ -25,7 +25,10 @@ mg.input = (function() {
     incoming: {
       initialise  : 'mgc-initialise',
       selfDestruct: 'mgc-self-destruct',
-      stage_start       : 'mgu-stage-start',
+      stage_start : 'mgu-stage-start',
+      // Receive joystick
+      joystick_dir: 'mgu-joystick-dir',
+      joystick_aim: 'mgu-joystick-aim',
     },
     internal: {
     
@@ -34,6 +37,9 @@ mg.input = (function() {
       input_key_movement: 'mgi-input-key-movement',
       input_key_action  : 'mgi-input-key-action',
       input_key_miscellaneous: 'mgi-input-key-misc',
+      
+      input_joystick_dir: `mgi-input-joystick-dir`,
+      input_joystick_aim: `mgi-input-joystick-aim`,
     },
   }
   
@@ -47,7 +53,45 @@ mg.input = (function() {
     main = qset(`#${settings.app.id_tray}`)
     
     body.addEventListener('keypress', keyed)
+    listen()
   }
+  
+  let listen = function() {
+  
+    // Joysticks
+    main.addEventListener( events.incoming.joystick_dir, joystickDir )
+    main.addEventListener( events.incoming.joystick_aim, joystickAim )
+  }
+  
+  let joystickRotation = function(x, y) {
+    let r = Math.atan2(y, x)
+        r = r * 180 / Math.PI
+        r -= 90
+    if (r > 0) r -= 360
+        r *= -1
+    return (r * Math.PI) / 180
+  }
+  let joystickDir = function(e) {
+    let datum = e.detail
+    let x = parseInt(e.detail.x)
+    let y = parseInt(e.detail.y)
+    let r = joystickRotation(x, y)
+    
+    raiseEvent( main, events.outgoing.input_joystick_dir, {x: x, y: y, r: r, c: datum.cardinalDirection, xp: datum.xPosition, yp: datum.yPosition} )
+  }
+  let joystickAim = function(e) {
+    let datum = e.detail
+    let x = parseInt(e.detail.x)
+    let y = parseInt(e.detail.y)
+    let r = joystickRotation(x, y)
+    
+    raiseEvent( main, events.outgoing.input_joystick_aim, {x: x, y: y, r: r, c: datum.cardinalDirection, xp: datum.xPosition, yp: datum.yPosition} )
+  }
+  
+  let calculateAngle = function(x,y) {
+    return Math.atan2(x/y)
+  }
+  
   
   let keyed = function(e) {
     let key = e.key
