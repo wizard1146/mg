@@ -18,6 +18,21 @@ mg.canvas = (function() {
     controls: {
       id_dir    : 'mg-joystick-dir',
       id_point  : 'mg-joystick-point',
+      js_dir_options: {
+        internalFillColor  : `rgba( 231, 231, 231, 0.87 )`,
+        internalLineWidth  : 7,
+        internalStrokeColor: `rgba(  14,  14,  14, 0.27 )`,
+        externalLineWidth  : 18,
+        externalStrokeColor: `rgba(  83,  83,  83, 0.03 )`,
+      },
+      js_point_options: {
+        internalFillColor  : `rgba( 231, 231, 231, 0.87 )`,
+        internalLineWidth  : 7,
+        internalStrokeColor: `rgba(  14,  14,  14, 0.27 )`,
+        externalLineWidth  : 18,
+        externalStrokeColor: `rgba(  83,  83,  83, 0.03 )`,
+        autoReturnToCenter : false,
+      }
     }
   }
   let events = {
@@ -65,13 +80,12 @@ document.querySelector('body').addEventListener( events.incoming.stage_start, (e
     canvas = qset(`#${settings.canvas.id}`)
     
     // add the joysticks
-    js_dir   = new JoyStick(settings.controls.id_dir, {}, (e) => {
+    js_dir   = new JoyStick(settings.controls.id_dir, settings.controls.js_dir_options, (e) => {
       console.log(e)
     })
-    js_point = new JoyStick(settings.controls.id_point, {}, (e) => {
+    js_point = new JoyStick(settings.controls.id_point, settings.controls.js_point_options, (e) => {
       console.log(e)
     })
-    
     
     // listen to canvas
     canvas.addEventListener( events.internal.canvas_mousemove, stageMove)
