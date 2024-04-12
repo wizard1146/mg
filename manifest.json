@@ -17,7 +17,7 @@
   "start_url": "/mg?source=pwa",
   "background_color": "#7293DB",
   "display": "standalone",
-  "scope": "/",
+  "scope": "/mg",
   "theme_color": "#7293DB",
   "shortcuts": [
   ],
