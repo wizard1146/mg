@@ -1,6 +1,6 @@
 {
-  "short_name": "gambit",
-  "name": "gambit",
+  "short_name": "Gambit",
+  "name": "Gambit",
   "icons": [
     {
       "src": "assets/icon-192.png",
@@ -15,11 +15,11 @@
   ],
   "id": "/mg?source=pwa",
   "start_url": "/mg?source=pwa",
-  "background_color": "#0D1835",
+  "background_color": "#7293DB",
   "display": "standalone",
   "scope": "/",
-  "theme_color": "#0D1835",
+  "theme_color": "#7293DB",
   "shortcuts": [
   ],
-  "description": "PWA for Magician's Gambit"
+  "description": "PWA for Gambit"
 }
