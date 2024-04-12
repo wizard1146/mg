@@ -20,6 +20,7 @@ mg.comptroller = (function() {
   
   /* Module Settings & Events */
   let settings = {
+    moduleClassName: 'mg-script',
     modules: [
       'comptroller',
       'utilities',
@@ -48,7 +49,7 @@ mg.comptroller = (function() {
       if (mg[module]) delete mg[module]
     })
     // empty "head"
-    qset( 'head' ).innerHTML = ''
+    document.querySelectorAll( '.' + settings.moduleClassName ).forEach(s => s.remove())
   }
   
   let completeInitialisation = function() {
@@ -72,7 +73,7 @@ mg.comptroller = (function() {
     let f = function(e) {
       if (loadList.length > 0) { initialise(loadList) } else { completeInitialisation() }
     }
-    let g = function(uri) { loadState++; report(`Loading ${uri}...`); let s = document.createElement('script'); s.src = uri; s.type = 'text/javascript'; s.addEventListener('load', f); h.appendChild(s) }
+    let g = function(uri) { loadState++; report(`Loading ${uri}...`); let s = document.createElement('script'); s.src = uri; s.type = 'text/javascript'; s.className = settings.moduleClassName; s.addEventListener('load', f); h.appendChild(s) }
     
     // begin
     g(`js/mg.${loadList.shift()}.js`)
