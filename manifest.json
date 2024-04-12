@@ -1,0 +1,25 @@
+{
+  "short_name": "Maggam",
+  "name": "Magician's Gambit",
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "id": "/mg?source=pwa",
+  "start_url": "/mg?source=pwa",
+  "background_color": "#0D1835",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#0D1835",
+  "shortcuts": [
+  ],
+  "description": "Magician's Gambit for Mobile"
+}
