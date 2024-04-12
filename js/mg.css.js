@@ -22,7 +22,7 @@ mg.css = (function() {
     id: {
       canvas_id_xy     : 'mgx-xy',
       joystick_dir     : 'mg-joystick-dir',
-      joystick_point   : 'mg-joystick-point',
+      joystick_point   : 'mg-joystick-aim',
     },
   }
   let events = {

@@ -15,25 +15,6 @@ mg.canvas = (function() {
     canvas  : {
       id        : 'mg-canvas',
     },
-    controls: {
-      id_dir    : 'mg-joystick-dir',
-      id_point  : 'mg-joystick-point',
-      js_dir_options: {
-        internalFillColor  : `rgba( 231, 231, 231, 0.87 )`,
-        internalLineWidth  : 7,
-        internalStrokeColor: `rgba(  14,  14,  14, 0.27 )`,
-        externalLineWidth  : 18,
-        externalStrokeColor: `rgba(  83,  83,  83, 0.03 )`,
-      },
-      js_point_options: {
-        internalFillColor  : `rgba( 231, 231, 231, 0.87 )`,
-        internalLineWidth  : 7,
-        internalStrokeColor: `rgba(  14,  14,  14, 0.27 )`,
-        externalLineWidth  : 18,
-        externalStrokeColor: `rgba(  83,  83,  83, 0.03 )`,
-        autoReturnToCenter : false,
-      }
-    }
   }
   let events = {
     incoming: {
@@ -53,7 +34,6 @@ mg.canvas = (function() {
   }
   /* Memory */
   let main, canvas, stageX = 0, stageY = 0;
-  let js_dir, js_point;
   /* Computational variables */
 
   
@@ -61,7 +41,7 @@ mg.canvas = (function() {
     // set up main
     main = qset( `#${settings.app.id_tray}` )
     
-document.querySelector('body').addEventListener( events.incoming.stage_start, (e) => { console.log(e)} )
+// document.querySelector('body').addEventListener( events.incoming.stage_start, (e) => { console.log(e)} )
     eventify()
   }
   
@@ -72,20 +52,10 @@ document.querySelector('body').addEventListener( events.incoming.stage_start, (e
   let stageStart = function() {
     let s = `center fullscreen`
     let c = `<canvas id="${settings.canvas.id}" class="${s}"></canvas>`
-        c += `<div id="${settings.controls.id_dir}"   class="absolute bottom-left"></div>`
-        c += `<div id="${settings.controls.id_point}" class="absolute bottom-right"></div>`
     
     main.insertAdjacentHTML('beforeend', c)
     
     canvas = qset(`#${settings.canvas.id}`)
-    
-    // add the joysticks
-    js_dir   = new JoyStick(settings.controls.id_dir, settings.controls.js_dir_options, (e) => {
-      console.log(e)
-    })
-    js_point = new JoyStick(settings.controls.id_point, settings.controls.js_point_options, (e) => {
-      console.log(e)
-    })
     
     // listen to canvas
     canvas.addEventListener( events.internal.canvas_mousemove, stageMove)

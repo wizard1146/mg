@@ -22,6 +22,25 @@ mg.ux = (function() {
       show_xy   : 'mgx-show-xy',
       id_xy     : 'mgx-xy',
     },
+    controls: {
+      id_dir    : 'mg-joystick-dir',
+      id_aim    : 'mg-joystick-aim',
+      js_dir_options: {
+        internalFillColor  : `rgba( 231, 231, 231, 0.87 )`,
+        internalLineWidth  : 7,
+        internalStrokeColor: `rgba(  14,  14,  14, 0.27 )`,
+        externalLineWidth  : 18,
+        externalStrokeColor: `rgba(  83,  83,  83, 0.03 )`,
+      },
+      js_aim_options: {
+        internalFillColor  : `rgba( 231, 231, 231, 0.87 )`,
+        internalLineWidth  : 7,
+        internalStrokeColor: `rgba(  14,  14,  14, 0.27 )`,
+        externalLineWidth  : 18,
+        externalStrokeColor: `rgba(  83,  83,  83, 0.03 )`,
+        autoReturnToCenter : false,
+      }
+    }
   }
   let events = {
     incoming: {
@@ -36,6 +55,9 @@ mg.ux = (function() {
     outgoing: {
       stage_start      : 'mgu-stage-start',
       state_change     : 'mgu-state-change',
+      
+      joystick_dir: 'mgu-joystick-dir',
+      joystick_aim: 'mgu-joystick-aim',
     },
   }
   
@@ -44,6 +66,7 @@ mg.ux = (function() {
   let SUBSTATE = { STORY: 0, CHARSHEET: 1, INVENTORY: 2 }
   /* Memory */
   let body, main, state, substate, showX, showY;
+  let js_dir, js_aim;
   
   /* Computational variables */
 
@@ -72,7 +95,7 @@ mg.ux = (function() {
     listen()
     
     // SIMULATE: request a game level + canvas
-    setTimeout(function() { raiseEvent( main, events.outgoing.stage_start ) }, 1000)
+    setTimeout(requestStage, 1000)
   }
   
   let listen = function() {
@@ -82,6 +105,8 @@ mg.ux = (function() {
     main.addEventListener( events.incoming.stage_move, updateStageXY )
   }
 
+  
+    
 
   let mainMenu = function() {
   
@@ -94,6 +119,26 @@ mg.ux = (function() {
   let updateStageXY = function(e) {
     showX.innerHTML = (e.detail[0].toFixed(1)).toString().padStart(6,' ')
     showY.innerHTML = (e.detail[1].toFixed(1)).toString().padStart(6,' ')
+  }
+  
+  /* Stage */
+  let requestStage = function() {
+  
+    // request Canvas
+    raiseEvent( main, events.outgoing.stage_start )
+    
+    // add the joysticks
+    inject(`<div id="${settings.controls.id_dir}" class="absolute bottom-left"></div><div id="${settings.controls.id_aim}" class="absolute bottom-right"></div>`)
+    js_dir   = new JoyStick(settings.controls.id_dir, settings.controls.js_dir_options, jsNotifyDir)
+    js_point = new JoyStick(settings.controls.id_aim, settings.controls.js_aim_options, jsNotifyAim)
+  }
+  
+  /* Joystick interactions */
+  let jsNotifyDir = function(e) {
+    raiseEvent( main, events.outgoing.joystick_dir, e)
+  }
+  let jsNotifyAim = function(e) {
+    raiseEvent( main, events.outgoing.joystick_aim, e)
   }
   
   // Wipe & Subwipe functions
