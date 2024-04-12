@@ -16,7 +16,7 @@
   "id": "/mg?source=pwa",
   "start_url": "/mg?source=pwa",
   "background_color": "#0D1835",
-  "display": "standalone",
+  "display": "fullscreen",
   "scope": "/mg",
   "theme_color": "#0D1835",
   "shortcuts": [

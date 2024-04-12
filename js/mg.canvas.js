@@ -57,10 +57,9 @@ document.querySelector('body').addEventListener( events.incoming.stage_start, (e
   let stageStart = function() {
     let s = `center fullscreen`
     let c = `<canvas id="${settings.canvas.id}" class="${s}"></canvas>`
-        c += `<div id="${settings.controls.id_dir}" class="absolute top-left"></div>`
-        c += `<div id="${settings.controls.id_point}" class="absolute bottom-left"></div>`
+        c += `<div id="${settings.controls.id_dir}"   class="absolute bottom-left"></div>`
+        c += `<div id="${settings.controls.id_point}" class="absolute bottom-right"></div>`
     
-    console.log(main, c)
     main.insertAdjacentHTML('beforeend', c)
     
     canvas = qset(`#${settings.canvas.id}`)
