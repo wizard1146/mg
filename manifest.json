@@ -15,10 +15,10 @@
   ],
   "id": "/mg?source=pwa",
   "start_url": "/mg?source=pwa",
-  "background_color": "#7293DB",
+  "background_color": "#0D1835",
   "display": "standalone",
   "scope": "/mg",
-  "theme_color": "#7293DB",
+  "theme_color": "#0D1835",
   "shortcuts": [
   ],
   "description": "PWA for Gambit"
