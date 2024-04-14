@@ -206,7 +206,7 @@ mg.canvas = (function() {
     
     ctx.strokeStyle = settings.canvas.grid.style
     L.boundLeft.forEach(x => {
-      let Line = (x - h.x)/sf + transform.
+      let Line = (x - h.x)/sf + transform.left
       ctx.beginPath()
       ctx.moveTo( Line, vmax)
       ctx.lineTo( Line, vmin)
