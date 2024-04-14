@@ -12,7 +12,9 @@ mg.engine = (function() {
       id_subtray: 'mg-submain',
     },
     game    : {
-      size_quadrant: 50000,
+      speed_limiter: 14,
+    
+      size_quadrant: 30000,
       size_sector  :   500,
       count_sector :    21,
       count_stars  :   898,
@@ -101,8 +103,8 @@ mg.engine = (function() {
     let magnitude = hero.v.m
     let rotation  = hero.v.r
     
-    hero.deltaX = hero.v.x / 20
-    hero.deltaY = hero.v.y / 20
+    hero.deltaX = hero.v.x / settings.game.speed_limiter
+    hero.deltaY = hero.v.y / settings.game.speed_limiter
     
     // resolve deltas
     if (hero.deltaX != 0) {
