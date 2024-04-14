@@ -40,12 +40,19 @@ mg.ux = (function() {
         externalStrokeColor: `rgba(  83,  83,  83, 0.03 )`,
         autoReturnToCenter : false,
       }
+    },
+    hud: {
+      id_hud      : 'mg-hud-main',
+      id_x        : 'mg-hud-x',
+      id_y        : 'mg-hud-y',
+      class_coords: 'mg-hud-class-coords',
     }
   }
   let events = {
     incoming: {
       initialise  : 'mgc-initialise',
       stage_move  : 'mgx-stage-move',
+      canvas_tick : 'mgc-outgoing-tick',
     },
     internal: {
       state_transition : 'mgu-transition',
@@ -69,6 +76,7 @@ mg.ux = (function() {
   /* Memory */
   let body, main, state, substate, showX, showY;
   let js_dir, js_aim;
+  let hudX, hudY;
   
   /* Computational variables */
 
@@ -107,6 +115,9 @@ mg.ux = (function() {
     main.addEventListener( events.internal.container_subwipe, subwipe )
     
     main.addEventListener( events.incoming.stage_move, updateStageXY )
+    
+    // Listen for Canvas Tick
+    main.addEventListener( events.incoming.canvas_tick, updateCoordinates )
   }
 
   
@@ -125,6 +136,14 @@ mg.ux = (function() {
     showY.innerHTML = (e.detail[1].toFixed(1)).toString().padStart(6,' ')
   }
   
+  let updateCoordinates = function(e) {
+    let data = e.detail.data
+    let hero = data.hero
+    
+    hudX.innerHTML = hero.x
+    hudY.innerHTML = hero.y
+  }
+  
   /* Stage */
   let requestStage = function() {
   
@@ -135,6 +154,14 @@ mg.ux = (function() {
     inject(`<div id="${settings.controls.id_dir}" class="absolute bottom-left"></div><div id="${settings.controls.id_aim}" class="absolute bottom-right"></div>`)
     js_dir   = new JoyStick(settings.controls.id_dir, settings.controls.js_dir_options, jsNotifyDir)
     js_point = new JoyStick(settings.controls.id_aim, settings.controls.js_aim_options, jsNotifyAim)
+    
+    // add the HUD
+    inject(`<div id="${settings.hud.id_hud}" class="absolute bottom-middle dev">
+     <div id="${settings.hud.id_x}" class="{$settings.hud.class_coords}"><div class="label">X</div><div class="value"></div></div>
+     <div id="${settings.hud.id_y}" class="${settings.hud.class_coords}"><div class="label">Y</div><div class="value"></div></div>
+    </div>`)
+    hudX = qset(`#${settings.hud.id_x} .value`)
+    hudY = qset(`#${settings.hud.id_y} .value`)
   }
   
   /* Joystick interactions */

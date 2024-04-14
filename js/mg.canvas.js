@@ -16,7 +16,16 @@ mg.canvas = (function() {
       id_subtray: 'mg-submain',
     },
     canvas  : {
-      id        : 'mg-canvas',
+      id    : 'mg-canvas',
+      hero  : {
+        sprite_width : 156,
+        sprite_height: 294,
+        sprite_ratio : 294 / 156,
+        size: 25,
+      },
+      grid  : {
+        style: `rgba( 133, 133, 133, 0.33 )`,
+      }
     },
   }
   let events = {
@@ -39,6 +48,11 @@ mg.canvas = (function() {
   }
   /* Memory */
   let main, canvas, ctx, sf = 1, stageX = 0, stageY = 0;
+  let data;
+  let transform = {
+    left: 0,
+    top : 0,
+  }
   /* Computational variables */
 
   
@@ -74,7 +88,7 @@ mg.canvas = (function() {
     // set up main
     main = qset( `#${settings.app.id_tray}` )
 
-// document.querySelector('body').addEventListener( events.incoming.stage_start, (e) => { console.log(e)} )
+    // document.querySelector('body').addEventListener( events.incoming.stage_start, (e) => { console.log(e)} )
     eventify()
   }
   
@@ -107,6 +121,10 @@ mg.canvas = (function() {
     // preload hero
     hero = new Image()
     hero.src = 'assets/arrow.png'
+    
+    // set up the transformation
+    transform.left = canvas.width  / 2 * 1/sf
+    transform.top  = canvas.height / 2 * 1/sf
     
     // start the loop
     anim.prep()
@@ -145,15 +163,10 @@ mg.canvas = (function() {
     raiseEvent( main, events.outgoing.stage_move, [stageX, stageY] )
   }
   
-  // Tick	
-    let w = 156
-    let h = 294
-    let r = h/w
-    let t = 25
-    
+  // Tick
   let tick = function(e) {
-    // Notify the modules
-    raiseEvent( main, events.outgoing.tick, [e.detail] )
+    // Grab latest data
+    data = engine.data()
     
     // Clear
     ctx.clearRect( 0, 0, canvas.width, canvas.height )
@@ -161,16 +174,50 @@ mg.canvas = (function() {
     // Draw the background
     
     // Draw the hero
-    let m = engine.data()
+    renderHero()
+    
+    // Draw the gridlines
+    renderGrid()
+    
+    // Notify the modules
+    raiseEvent( main, events.outgoing.tick, {data: data, frames: e.detail} )
+  }
+  
+  let renderHero = function() {
+    let h = data.hero
+    let t = settings.canvas.hero.size
+    let r = settings.canvas.hero.sprite_ratio
     ctx.save()
-    ctx.translate( canvas.width/4, canvas.height/4 )
-    ctx.rotate( m.hero.rotation )
+    ctx.translate( transform.left, transform.top )
+    ctx.rotate( h.r )
     ctx.translate( -t/2, -t*r/2 )
     ctx.drawImage( hero, 0, 0, t, t*r )
     ctx.restore()
+  }
+  
+  let renderGrid = function() {
+    let L = data.limits
     
-    // ctx.drawImage( hero, canvas.width/2 - t/2, canvas.height/2 - t*r/2, t, t*r )
+    let vmax = 1.33 * L.boundBottom.reduce((a, b) => Math.max(a, b), -Infinity)
+    let vmin = 1.33 * L.boundBottom.reduce((a, b) => Math.min(a, b),  Infinity)
+    let hmax = 1.33 * L.boundLeft.reduce((a,b) => Math.max(a, b), -Infinity)
+    let hmin = 1.33 * L.boundLeft.reduce((a,b) => Math.min(a, b),  Infinity)
     
+    ctx.strokeStyle = settings.canvas.grid.style
+    L.boundLeft.forEach(x => {
+      let Line = x/sf + transform.left
+      ctx.beginPath()
+      ctx.moveTo( Line, vmax)
+      ctx.lineTo( Line, vmin)
+      ctx.stroke()
+    })
+    L.boundBottom.forEach(x => {
+      let Line = x/sf + transform.top
+      ctx.beginPath()
+      ctx.moveTo( hmin, Line)
+      ctx.lineTo( hmax, Line)
+      ctx.stroke()
+    })
   }
 
   // Initialisation listener

@@ -71,27 +71,15 @@ mg.input = (function() {
         r *= -1
     return (r * Math.PI) / 180
   }
-  let joystickDir = function(e) {
-    let datum = e.detail
-    let x = parseInt(e.detail.x)
-    let y = parseInt(e.detail.y)
-    let r = joystickRotation(x, y)
-    
-    raiseEvent( main, events.outgoing.input_joystick_dir, {x: x, y: y, r: r, c: datum.cardinalDirection, xp: datum.xPosition, yp: datum.yPosition} )
+  let joystickDir = function(e) { joystickInterpret(e.detail, 'dir') }
+  let joystickAim = function(e) { joystickInterpret(e.detail, 'aim') }
+  let joystickInterpret = function(datum, type) {
+    let x  = parseInt(datum.x)
+    let y  = parseInt(datum.y)
+    let r  = joystickRotation(x, y)
+    let ev = events.outgoing['input_joystick_' + type]
+    raiseEvent( main, ev, {x: x, y: y, r: r, c: datum.cardinalDirection, xp: datum.xPosition, yp: datum.yPosition} )
   }
-  let joystickAim = function(e) {
-    let datum = e.detail
-    let x = parseInt(e.detail.x)
-    let y = parseInt(e.detail.y)
-    let r = joystickRotation(x, y)
-    
-    raiseEvent( main, events.outgoing.input_joystick_aim, {x: x, y: y, r: r, c: datum.cardinalDirection, xp: datum.xPosition, yp: datum.yPosition} )
-  }
-  
-  let calculateAngle = function(x,y) {
-    return Math.atan2(x/y)
-  }
-  
   
   let keyed = function(e) {
     let key = e.key

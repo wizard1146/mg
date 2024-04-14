@@ -17,12 +17,21 @@ mg.css = (function() {
     joysticks: {
       size         : `50vmin`,
     },
+    hud      : {
+      width        : `40%`,
+      height       : `13vmin`,
+    },
     // ux
     
+    // IDs
     id: {
       canvas_id_xy     : 'mgx-xy',
       joystick_dir     : 'mg-joystick-dir',
       joystick_point   : 'mg-joystick-aim',
+      hud_main         : 'mg-hud-main',
+      hud_x            : 'mg-hud-x',
+      hud_y            : 'mg-hud-y',
+      hud_coords_class : 'mg-hud-class-coords',
     },
   }
   let events = {
@@ -64,6 +73,9 @@ mg.css = (function() {
     `,
     `
     /* Shorthand classes */
+    .dev {
+      border: 1px solid rgba( 255, 1, 1, 1 );
+    }
     .absolute {
       position : absolute;
     }
@@ -94,6 +106,11 @@ mg.css = (function() {
     .bottom-right {
       right    : 0%;
       bottom   : 0%;
+    }
+    .bottom-middle {
+      left     : 50%;
+      bottom   : 0%;
+      transform: translate( -50%, 0% );
     }
     .bottom-left {
       left     : 0%;
@@ -148,6 +165,27 @@ mg.css = (function() {
     }
     #${settings.id.joystick_dir},
     #${settings.id.joystick_point} {
+    
+    }
+    
+    /* HUD */
+    #${settings.id.hud_main} {
+      width  : ${settings.hud.width};
+      height : ${settings.hud.height};
+    }
+    #${settings.id.hud_x},
+    #${settings.id.hud_y} {
+      color: white;
+    }
+    #${settings.id.hud_x} div,
+    #${settings.id.hud_y} div {
+      display: inline-block;
+    }
+    #${settings.id.hud_x} .value,
+    #${settings.id.hud_y} .value {
+    
+    }
+    .${settings.id.hud_coords_class} {
     
     }
     `,
