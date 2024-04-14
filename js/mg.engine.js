@@ -12,7 +12,7 @@ mg.engine = (function() {
       id_subtray: 'mg-submain',
     },
     game    : {
-      size_quadrant: 10000,
+      size_quadrant: 50000,
       size_sector  :   500,
       count_sector :    21,
       count_stars  :   898,
@@ -35,14 +35,7 @@ mg.engine = (function() {
   let body, main;
   // Main data output
   let data = {
-    hero: {
-      deltaX: 0,
-      deltaY: 0,
-      deltaRotation: 0,
-      x : 0,
-      y : 0,
-      r : 0,
-    },
+    hero   : {},
     sectors: {},
     limits : {
       boundLeft: [],
@@ -54,49 +47,6 @@ mg.engine = (function() {
   /* Computational variables */
 
 
-  /* Classes */
-  class Artefact {
-    constructor(k, options) {
-      // Key, X, Y, Type, Seed
-      this.k = k
-      let args = {
-        x: 1,
-        y: 1,
-        t: 'undefined',
-        r: 0,
-        s: Math.random(),
-      }
-      Object.entries(args).forEach(([k,v],i) => {
-        if (options && options[k]) {
-          this[k] = options[k]
-        } else {
-          this[k] = v
-        }
-      })
-      this.deltaX = 0
-      this.deltaY = 0
-      this.deltaRotation = 0
-    }
-  }
-  
-  class Star extends Artefact {
-    constructor(key, options) {
-      options.t = 'star'
-      super(key, options)
-    }
-  }
-  
-  class Actor extends Artefact {
-    constructor(key, options) {
-      super(key, options)
-    }
-  }
-  
-  class Player extends Actor {
-    constructor(key, options) {
-      super(key, options)
-    }
-  }
 
   /* Initialise */
   let initialise = function() {
@@ -129,6 +79,12 @@ mg.engine = (function() {
   let joystickDir = function(e) {
     let datum = e.detail
     
+    data.hero.v = {
+      x: datum.x,
+      y: datum.y,
+      m: datum.len,
+      r: datum.r,
+    }
   }
   let joystickAim = function(e) {
     let datum = e.detail
@@ -141,12 +97,21 @@ mg.engine = (function() {
   let updateHero = function() {
     let hero = data.hero
     let changed = false
+    // add velocity
+    let magnitude = hero.v.m
+    let rotation  = hero.v.r
+    
+    hero.deltaX = hero.v.x / 20
+    hero.deltaY = hero.v.y / 20
+    
     // resolve deltas
     if (hero.deltaX != 0) {
+      hero.x += hero.deltaX
       hero.deltaX = 0
       changed = true
     }
     if (hero.deltaY != 0) {
+      hero.y += hero.deltaY
       hero.deltaY = 0
       changed = true
     }
@@ -290,6 +255,56 @@ mg.engine = (function() {
       s = k[i]
     }
     return {sx: r, sy: s, left: p, bottom: q}
+  }
+  
+  /* Classes */
+  class Artefact {
+    constructor(k, options) {
+      // Key, X, Y, Type, Seed
+      this.k = k
+      let args = {
+        x: 0,
+        y: 0,
+        t: 'undefined',
+        r: 0,
+        s: Math.random(),
+        v: {
+          m: 0,
+          r: 0,
+          x: 0,
+          y: 0,
+        }
+      }
+      Object.entries(args).forEach(([k,v],i) => {
+        if (options && options[k]) {
+          this[k] = options[k]
+        } else {
+          this[k] = v
+        }
+      })
+      this.deltaX = 0
+      this.deltaY = 0
+      this.deltaRotation = 0
+    }
+  }
+  
+  class Star extends Artefact {
+    constructor(key, options) {
+      options.t = 'star'
+      super(key, options)
+    }
+  }
+  
+  class Actor extends Artefact {
+    constructor(key, options) {
+      super(key, options)
+    }
+  }
+  
+  class Player extends Actor {
+    constructor(key, options) {
+      super(key, options)
+    }
   }
   
   // Initialisation listener

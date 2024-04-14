@@ -77,8 +77,9 @@ mg.input = (function() {
     let x  = parseInt(datum.x)
     let y  = parseInt(datum.y)
     let r  = joystickRotation(x, y)
+    let len = Math.sqrt(x*x + y*y)
     let ev = events.outgoing['input_joystick_' + type]
-    raiseEvent( main, ev, {x: x, y: y, r: r, c: datum.cardinalDirection, xp: datum.xPosition, yp: datum.yPosition} )
+    raiseEvent( main, ev, {x: x, y: y, r: r, len: len, c: datum.cardinalDirection, xp: datum.xPosition, yp: datum.yPosition} )
   }
   
   let keyed = function(e) {

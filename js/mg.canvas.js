@@ -197,6 +197,7 @@ mg.canvas = (function() {
   
   let renderGrid = function() {
     let L = data.limits
+    let h = data.hero
     
     let vmax = 1.33 * L.boundBottom.reduce((a, b) => Math.max(a, b), -Infinity)
     let vmin = 1.33 * L.boundBottom.reduce((a, b) => Math.min(a, b),  Infinity)
@@ -205,14 +206,14 @@ mg.canvas = (function() {
     
     ctx.strokeStyle = settings.canvas.grid.style
     L.boundLeft.forEach(x => {
-      let Line = x/sf + transform.left
+      let Line = (x + hero.x)/sf + transform.left
       ctx.beginPath()
       ctx.moveTo( Line, vmax)
       ctx.lineTo( Line, vmin)
       ctx.stroke()
     })
-    L.boundBottom.forEach(x => {
-      let Line = x/sf + transform.top
+    L.boundBottom.forEach(y => {
+      let Line = (y + hero.y)/sf + transform.top
       ctx.beginPath()
       ctx.moveTo( hmin, Line)
       ctx.lineTo( hmax, Line)
