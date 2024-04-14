@@ -195,7 +195,6 @@ mg.canvas = (function() {
     ctx.restore()
   }
   
-  let c = 12000
   let renderGrid = function() {
     let L = data.limits
     let h = data.hero
@@ -207,9 +206,7 @@ mg.canvas = (function() {
     
     ctx.strokeStyle = settings.canvas.grid.style
     L.boundLeft.forEach(x => {
-    c--
-      let Line = (x - h.x)/sf + transform.left
-      if (c > 0) console.log(Line, hero)
+      let Line = (x - h.x)/sf + transform.
       ctx.beginPath()
       ctx.moveTo( Line, vmax)
       ctx.lineTo( Line, vmin)
