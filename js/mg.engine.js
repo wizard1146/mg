@@ -12,11 +12,15 @@ mg.engine = (function() {
       id_subtray: 'mg-submain',
     },
     game    : {
+      size_unit    : 25,
+      sizpu_sector : 43,
+
       speed_limiter: 14,
+      speed_max    : 100,
     
       size_quadrant: 30000,
       size_sector  :   500,
-      count_sector :    21,
+      count_sector :    5,
       count_stars  :   898,
     }
   }
@@ -39,15 +43,10 @@ mg.engine = (function() {
   let data = {
     hero   : {},
     sectors: {},
-    limits : {
-      boundLeft: [],
-      assocLeft: [],
-      boundBottom: [],
-      assocBottom: [],
-    }
+    limits : {}
   }
   /* Computational variables */
-
+  let collider;
 
 
   /* Initialise */
@@ -56,9 +55,44 @@ mg.engine = (function() {
     
     body.addEventListener( events.incoming.injected_main, function() { main = qset(`#${settings.app.id_tray}`); listen(); start(); } )
   }
+
+/*
+
+        player.collisionObject.x += player.changeX
+        player.collisionObject.y += player.changeY
+        // Collision checking
+        this.collider.update()
+        // Collision resolution
+        let potentials = player.collisionObject.potentials()
+        for (const potential of potentials) {
+          let collided = player.collisionObject.collides(potential, player.collisionResult)
+          if (collided) {
+            player.collisionObject.x -= player.collisionResult.overlap * player.collisionResult.overlap_x
+            player.collisionObject.y -= player.collisionResult.overlap * player.collisionResult.overlap_y
+          }
+        }
+
+    // Collision Object
+    player.width = this.playerWidth
+    player.torso = this.playerTorso
+    player.legs  = this.playerLegs
+    const shape = [
+       [-1 * player.width/2, -1 * player.torso],
+       [ 1 * player.width/2, -1 * player.torso],
+       [ 1 * player.width/2,  1 * player.legs ],
+       [-1 * player.width/2,  1 * player.legs ],
+    ]
+    player.collisionObject = this.collider.createPolygon(point.x, point.y, shape) //[[-14,-15],[14,-15],[14,20],[-14,20]]
+*/
   
   /* Start function */
   let start = function() {
+    // preform some calculations
+    settings.game.size_sector = settings.game.sizpu_sector * settings.game.size_unit / 2
+    settings.game.size_quadrant = settings.game.sizpu_sector * 5
+
+    // generate collider
+    collider = new collisions.generate()
     // generate map
     generateMap()
     // generate player
@@ -134,110 +168,213 @@ mg.engine = (function() {
     
     data.hero = hero
   }
-  // Generate Map
+
   let generateMap = function() {
-    let starCount = settings.game.count_stars
-    let size = settings.game.size_quadrant
     let sect  = settings.game.size_sector
     let count = settings.game.count_sector
     let half  = Math.floor(count/2)
     
     let mx, my;
-    let limits = {
-      up   :  half,
-      down : -half,
-      left : -half,
-      right:  half,
-    }
     for (var i = 0; i < count; i++) {
       mx = i - half
       for (var j = 0; j < count; j++) {
         my = j - half
         
-        var name = `sector_MX${mx}_MY${my}`
-        
-        // Map neighbours
-        var n     = []
-        var up    = my + 1
-        var down  = my - 1
-        var left  = mx - 1
-        var right = mx + 1
-        // rotate TOP ROW, LEFT COL, BOTTOM ROW, RIGHT COL
-        if (up <= limits.up) {
-          if (left >= limits.left) {
-            n.push(`sector_MX${mx-1}_MY${my+1}`)
-          }
-          n.push(`sector_MX${mx}_MY${my+1}`)
-          if (right <= limits.right) {
-            n.push(`sector_MX${mx+1}_MY${my+1}`)
-          }
-        }
-        if (right <= limits.right) {
-          n.push(`sector_MX${mx+1}_MY${my}`)
-          if (down >= limits.down) {
-            n.push(`sector_MX${mx+1}_MY${my-1}`)
-          }
-        }
-        if (down >= limits.down) {
-          n.push(`sector_MX${mx}_MY${my-1}`)
-          if (left >= limits.left) {
-            n.push(`sector_MX${mx-1}_MY${my-1}`)
-          }
-        }
-        if (left >= limits.left) {
-          n.push(`sector_MX${mx-1}_MY${my}`)
-        }
-        
-        let mpx, mpy;
-        mpx = mx * sect * 2
-        mpy = my * sect * 2
-        
-        data.sectors[name] = {
-          x : mpx,
-          y : mpy,
-          w : mpx - sect,
-          e : mpx + sect - 1,
-          n : mpy + sect - 1,
-          s : mpy - sect,
-          rangeVertical  : [mpy - sect, mpy + sect - 1],
-          rangeHorizontal: [mpx - sect, mpx + sect - 1],
-          neighbours     : n,
-          items          : {},
-        }
-        data.limits = data.limits || {}
-        data.limits.boundLeft = data.limits.boundLeft || []
-        data.limits.assocLeft = data.limits.assocLeft || []
-        if (data.limits.boundLeft.indexOf(mpx - sect) == -1) { data.limits.boundLeft.push( mpx - sect ); data.limits.assocLeft.push( mx ) }
-        data.limits.boundBottom = data.limits.boundBottom || []
-        data.limits.assocBottom = data.limits.assocBottom || []
-        if (data.limits.boundBottom.indexOf(mpy - sect) == -1) { data.limits.boundBottom.push( mpy - sect ); data.limits.assocBottom.push( my ) }
+        let tile = new Tile({mx: mx, my: my})
+        data.sectors[tile.k] = tile
       }
     }
-    
-    // clear stars
-    data.stars = {}
-    
-    // seed with stars
-    for (var i = 0; i < starCount; i++) {
-      let x = Math.floor(Math.random() * size * 2 - size)
-      let y = Math.floor(Math.random() * size * 2 - size)
-      let c = `star_x${x}_y${y}`
-      
-      // calculate sector
-      let bounds = getSector(x,y)
-      let sectorAddress = `sector_MX${bounds.sx}_MY${bounds.sy}`
-      
-      let star = new Star(c, {x: x, y: y})
-      
-      data.stars[c] = star
-      
-      let sector = data.sectors[sectorAddress]
-      if (sector) {
-        sector.items[c] = star
+    data.limits = calculateGridLimits()
+  }
+
+  let calculateGridLimits = function() {
+    const ss = settings.game.size_sector
+    let vmax, vmin, hmax, hmin;
+    Object.entries(data.sectors).forEach(([name,data],index) => {
+      hmin = hmin < data.w ? hmin : data.w
+      hmax = hmax > data.e ? hmax : data.e
+      vmin = vmin < data.s ? vmin : data.s
+      vmax = vmax > data.n ? vmax : data.n
+    })
+    let hlims = [], vlims = [];
+    for (var i = hmin; i < hmax; i += ss*2) {
+      hlims.push(i)
+    }
+    for (var i = vmin; i < vmax; i += ss*2) {
+      vlims.push(i)
+    }
+    return {hmin: hmin, hmax: hmax, vmin: vmin, vmax: vmax, vlims: vlims, hlims: hlims}
+  }
+
+  let getSector = function(x,y) {
+    const ss = settings.game.size_sector
+    let a = data.limits.hlims, b, c, d;
+    let e = data.limits.vlims, f, g, h;
+
+    // Walk Left to Right
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] > x) { 
+        // get the midpoint
+        c = (b + a[i])/2
+        d = c/(ss*2)
+        break 
       }
+      b = a[i]
+    }
+    // Walk Top to Bottom
+    for (var i = 0; i < e.length; i++) {
+      if (e[i] > y) { 
+        // get the midpoint
+        g = (f + e[i])/2
+        h = g/(ss*2)
+        break 
+      }
+      f = e[i]
+    }
+    return {sx: d, sy: h, left: c, bottom: g}
+  }
+  
+  let getTile = function(key) {
+    return data.sectors[key] ? data.sectors[key] : false
+  }
+  
+  /* Classes */
+  class Artefact {
+    constructor(k, options) {
+      // Key, X, Y, Type, Seed
+      this.k = k
+      let args = {
+        x: 0,
+        y: 0,
+        t: 'undefined',
+        s: Math.random(),
+        r: 0,
+      }
+      Object.entries(args).forEach(([k,v],i) => {
+        if (options && options[k]) {
+          this[k] = options[k]
+        } else {
+          this[k] = v
+        }
+      })
+    }
+  }
+
+  class Collidable extends Artefact {
+    constructor(key, options) {
+      super(key, options)
+
+      const w = options ? (options?.w ? options?.w : settings.game.size_unit) : settings.game.size_unit
+      
+      const bounds = [
+        [-1 * w/2, -1 * w/2],
+        [ 1 * w/2, -1 * w/2],
+        [ 1 * w/2,  1 * w/2],
+        [-1 * w/2,  1 * w/2],
+      ]
+      this.collisionObject = collider.createPolygon(this.x, this.y, bounds)
+    }
+  }
+
+  class Movable extends Collidable {
+    constructor(key, options) {
+      super(key, options)
+      this.deltaX = 0
+      this.deltaY = 0
+      this.deltaRotation = 0
+    }
+  }
+
+  class Tile extends Collidable {
+    constructor(options) {
+      const mx = options.mx
+      const my = options.my
+      const key = `sector_MX${mx}_MY${my}`
+ 
+      super(key, options)
+
+      const ss = settings.game.size_sector 
+
+      const mpx = mx * ss * 2
+      const mpy = my * ss * 2    
+
+      this.name = key
+      this.mx   = mx
+      this.my   = my
+      this.t = 'tile'
+      this.x = mpx
+      this.y = mpy
+      this.w = mpx - ss
+      this.e = mpx + ss - 1
+      this.n = mpy + ss - 1
+      this.s = mpy - ss
+      this.rangeVertical   = [mpy - ss, mpy + ss - 1]
+      this.rangeHorizontal = [mpx - ss, mpx + ss - 1]
+      this.items           = {}
+
+      this.neighbours      = this.getNeighbours()
+    }
+
+    getNeighbours() {
+      var n      = []
+      var up     = this.my + 1
+      var down   = this.my - 1 
+      var left   = this.mx - 1
+      var right  = this.mx + 1
+      // Fill ABOVE, RIGHT, BELOW, LEFT
+      for (var i = down; i < up+1; i++) {
+        for (var j = left; j < right+1; j++) {
+           n.push(`sector_MX${j}_MY${i}`)
+        }
+      }
+      n.splice(n.indexOf(this.key), 1)
+      return n
     }
   }
   
+  class Star extends Artefact {
+    constructor(key, options) {
+      options.t = 'star'
+      super(key, options)
+    }
+  }
+  
+  class Actor extends Movable {
+    constructor(key, options) {
+      super(key, options)
+      let args = {
+        v: {
+          m: 0,
+          r: 0,
+          x: 0,
+          y: 0,
+        }
+      }
+      Object.entries(args).forEach(([k,v],i) => {
+        if (options && options[k]) {
+          this[k] = options[k]
+        } else {
+          this[k] = v
+        }
+      })
+    }
+  }
+  
+  class Player extends Actor {
+    constructor(key, options) {
+      super(key, options)
+    }
+  }
+  
+  // Initialisation listener
+  qset('body').addEventListener( events.incoming.initialise, initialise )
+
+  return {
+    data: function() { return data },
+  }
+})()
+
+/*
   // Calculation Functions
   let getSector = function(x,y) {
     let m = data.limits.boundLeft
@@ -257,62 +394,30 @@ mg.engine = (function() {
       s = k[i]
     }
     return {sx: r, sy: s, left: p, bottom: q}
-  }
-  
-  /* Classes */
-  class Artefact {
-    constructor(k, options) {
-      // Key, X, Y, Type, Seed
-      this.k = k
-      let args = {
-        x: 0,
-        y: 0,
-        t: 'undefined',
-        r: 0,
-        s: Math.random(),
-        v: {
-          m: 0,
-          r: 0,
-          x: 0,
-          y: 0,
-        }
-      }
-      Object.entries(args).forEach(([k,v],i) => {
-        if (options && options[k]) {
-          this[k] = options[k]
-        } else {
-          this[k] = v
-        }
-      })
-      this.deltaX = 0
-      this.deltaY = 0
-      this.deltaRotation = 0
-    }
-  }
-  
-  class Star extends Artefact {
-    constructor(key, options) {
-      options.t = 'star'
-      super(key, options)
-    }
-  }
-  
-  class Actor extends Artefact {
-    constructor(key, options) {
-      super(key, options)
-    }
-  }
-  
-  class Player extends Actor {
-    constructor(key, options) {
-      super(key, options)
-    }
-  }
-  
-  // Initialisation listener
-  qset('body').addEventListener( events.incoming.initialise, initialise )
+  }*/
+/*
 
-  return {
-    data: function() { return data },
-  }
-})()
+    // clear stars
+    data.stars = {}
+    let starCount = settings.game.count_stars
+    let size = settings.game.size_quadrant
+    // seed with stars
+    for (var i = 0; i < starCount; i++) {
+      let x = Math.floor(Math.random() * size * 2 - size)
+      let y = Math.floor(Math.random() * size * 2 - size)
+      let c = `star_x${x}_y${y}`
+      
+      // calculate sector
+      let bounds = getSector(x,y)
+      let sectorAddress = `sector_MX${bounds.sx}_MY${bounds.sy}`
+      
+      let star = new Star(c, {x: x, y: y})
+      
+      data.stars[c] = star
+      
+      let sector = data.sectors[sectorAddress]
+      if (sector) {
+        sector.items[c] = star
+      }
+    }
+*/
