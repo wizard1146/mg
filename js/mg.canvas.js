@@ -120,7 +120,7 @@ mg.canvas = (function() {
     console.log(`Canvas w x h: ${canvasWidth}, ${canvasHeight}`)
     
     // listen to canvas
-    canvas.addEventListener( events.internal.canvas_mousemove, stageMove)
+    // canvas.addEventListener( events.internal.canvas_mousemove, stageMove)
     
     canvas.addEventListener( events.internal.canvas_tick, tick )
     
@@ -236,32 +236,6 @@ mg.canvas = (function() {
       ctx.stroke()
     }
     ctx.strokeStyle = settings.canvas.default_strokeStyle
-    
-  /*
-    let L = data.limits
-    let h = data.hero
-    
-    let vmax = L.vlims.reduce((a, b) => Math.max(a, b), -Infinity) + 1
-    let vmin = L.vlims.reduce((a, b) => Math.min(a, b),  Infinity) - 1
-    let hmax = L.hlims.reduce((a, b) => Math.max(a, b), -Infinity) + 1 
-    let hmin = L.hlims.reduce((a, b) => Math.min(a, b),  Infinity) - 1
-
-    ctx.strokeStyle = settings.canvas.grid.style
-    L.hlims.forEach(x => {
-      let Line = (x - h.x)/sf + transform.left
-      ctx.beginPath()
-      ctx.moveTo( Line, vmax)
-      ctx.lineTo( Line, vmin)
-      ctx.stroke()
-    })
-    L.vlims.forEach(y => {
-      let Line = (y - (h.y * -1))/sf + transform.top
-      ctx.beginPath()
-      ctx.moveTo( hmin, Line)
-      ctx.lineTo( hmax, Line)
-      ctx.stroke()
-    })
-    */
   }
 
   // Initialisation listener

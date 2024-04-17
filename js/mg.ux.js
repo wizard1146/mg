@@ -92,7 +92,7 @@ mg.ux = (function() {
     inject(`
      <div id="${settings.app.id_tray}">
        <div id="${settings.app.id_subtray}">
-         <div id="${settings.canvas.id_xy}" class="absolute top-right">
+         <div id="${settings.canvas.id_xy}" class="absolute top-right hidden">
            <div id="${settings.canvas.id_xy}-X" class="hidden relative"><div id="${settings.canvas.id_xy}-X-label">X</div><div id="${settings.canvas.id_xy}-X-value" class="absolute right text-right"></div></div>
            <div id="${settings.canvas.id_xy}-Y" class="hidden relative"><div id="${settings.canvas.id_xy}-Y-label">Y</div><div id="${settings.canvas.id_xy}-Y-value" class="absolute right text-right"></div></div>
          </div>

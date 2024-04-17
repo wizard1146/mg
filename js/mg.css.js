@@ -145,6 +145,9 @@ mg.css = (function() {
     .circle {
       border-radius: 50%;
     }
+    .hidden {
+      display: none;
+    }
     `,
     `
     /* Colors & Effects */
