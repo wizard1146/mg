@@ -25,7 +25,9 @@ mg.canvas = (function() {
       },
       grid  : {
         style: `rgba( 133, 133, 133, 0.33 )`,
-      }
+      },
+      // Reset canvas styles
+      default_strokeStyle: '#000',
     },
   }
   let events = {
@@ -207,14 +209,33 @@ mg.canvas = (function() {
        we only want to render to the edges of our screen
        we want to know the offset of 
    */
+    const ss = data.settings.size_sector
     let h = data.hero
-    let c = Math.ceil(canvasWidth / data.settings.size_sector)
     let deltaX = h.sector.left - h.x
-    let deltaY = h.sector.bottom - h.y
+    let deltaY = h.sector.bottom - (1 * h.y)
+    
+    let c = Math.ceil(canvasWidth / ss)
+    let d = Math.floor(c/2) + 1
     
     // console.log(c, `${h.sector.left} - ${Math.floor(h.x)}: `, Math.floor(deltaX), `${h.sector.bottom} - ${Math.floor(h.y)}: `, Math.floor(deltaY))
     
     
+    ctx.strokeStyle = settings.canvas.grid.style
+    for (var i = -d; i < d; i++) {
+      // draw Vertical lines
+      let xLine = deltaX/sf + transform.left + (i * ss)
+      ctx.beginPath()
+      ctx.moveTo( xLine,  d * ss )
+      ctx.lineTo( xLine, -d * ss )
+      ctx.stroke()
+      // draw Horizontal lines
+      let yLine = deltaY/sf + transform.top + (i * ss)
+      ctx.beginPath()
+      ctx.moveTo(  d * ss, -yLine )
+      ctx.lineTo( -d * ss, -yLine )
+      ctx.stroke()
+    }
+    ctx.strokeStyle = settings.canvas.default_strokeStyle
     
   /*
     let L = data.limits
