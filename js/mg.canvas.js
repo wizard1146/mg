@@ -10,7 +10,7 @@ mg.canvas = (function() {
   /* Module Settings & Events */
   let settings = {
     dpi     : 192, // 192, 288
-    fps     : 60,
+    fps     : 120,
     app     : {
       id_tray   : 'mg-main',
       id_subtray: 'mg-submain',
