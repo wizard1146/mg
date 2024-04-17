@@ -19,12 +19,13 @@ mg.css = (function() {
       size_max     : `180px`,
     },
     hud      : {
-      width         : `40%`,
-      height        : `13vmin`,
-      coordXY_width : `calc(7ch + 4ch)`,
-      sector_size   : `11ch`,
-      sector_margin : `1.4ch`,
-      sector_opacity: `0.4`,
+      width          : `40%`,
+      height         : `13vmin`,
+      coordXY_width  : `calc(7ch + 4ch)`,
+      coordXY_opacity: `0.55`,
+      sector_size    : `11ch`,
+      sector_margin  : `1.4ch`,
+      sector_opacity : `0.4`,
     },
     // ux
     
@@ -223,18 +224,7 @@ mg.css = (function() {
     }
     #${settings.id.hud_x},
     #${settings.id.hud_y} {
-    
-    }
-    #${settings.id.hud_x} div,
-    #${settings.id.hud_y} div {
-      display: inline-block;
-    }
-    #${settings.id.hud_x} .value,
-    #${settings.id.hud_y} .value {
-    
-    }
-    .${settings.id.hud_coords_class} {
-    
+      opacity: ${settings.hud.coordXY_opacity};
     }
     #${settings.id.hud_sector} {
       margin : ${settings.hud.sector_margin};

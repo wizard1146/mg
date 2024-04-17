@@ -24,7 +24,7 @@ mg.canvas = (function() {
         size: 24,
       },
       grid  : {
-        style: `rgba( 133, 133, 133, 0.33 )`,
+        style: `rgba( 133, 133, 167, 0.13 )`,
       },
       // Reset canvas styles
       default_strokeStyle: '#000',
