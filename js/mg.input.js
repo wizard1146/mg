@@ -12,6 +12,9 @@ mg.input = (function() {
       movement: ['w','a','s','d','W','A','S','D'],
       actions : ['p','l','P','L'],
     },
+    joystick: {
+      maximum: 100,
+    },
     app     : {
       id_tray   : 'mg-main',
       id_subtray: 'mg-submain',
@@ -77,9 +80,11 @@ mg.input = (function() {
     let x  = parseInt(datum.x)
     let y  = parseInt(datum.y)
     let r  = joystickRotation(x, y)
-    let len = Math.sqrt(x*x + y*y)
+    let len = Math.min( Math.sqrt(x*x + y*y), settings.joystick.maximum )
+    let mx  = len * Math.cos(r + Math.PI/2) * -1
+    let my  = len * Math.sin(r + Math.PI/2)
     let ev = events.outgoing['input_joystick_' + type]
-    raiseEvent( main, ev, {x: x, y: y, r: r, len: len, c: datum.cardinalDirection, xp: datum.xPosition, yp: datum.yPosition} )
+    raiseEvent( main, ev, {x: mx, y: my, r: r, len: len, c: datum.cardinalDirection, xp: datum.xPosition, yp: datum.yPosition} )
   }
   
   let keyed = function(e) {

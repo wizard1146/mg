@@ -229,7 +229,7 @@ mg.canvas = (function() {
       ctx.lineTo( xLine, -d * ss )
       ctx.stroke()
       // draw Horizontal lines
-      let yLine = deltaY/sf + transform.top + (i * ss)
+      let yLine = deltaY/sf - transform.top + (i * ss)
       ctx.beginPath()
       ctx.moveTo(  d * ss, -yLine )
       ctx.lineTo( -d * ss, -yLine )

@@ -122,9 +122,15 @@ mg.css = (function() {
     }
     `,
     `
-    /* Colors */
-    .light-grey {
+    /* Colors & Effects */
+    .translucent-white {
+      background: rgba( 255, 255, 255, 0.04 );
+    }
+    .text-grey {
       color   : rgba( 67, 67, 89, 1.00 );
+    }
+    .backdrop-blur {
+      backdrop-filter: blur(6px);
     }
     `,
     ` 
@@ -181,10 +187,12 @@ mg.css = (function() {
     #${settings.id.hud_main} {
       width  : ${settings.hud.width};
       height : ${settings.hud.height};
+      border-top-left-radius : 12px;
+      border-top-right-radius: 12px;
     }
     #${settings.id.hud_x},
     #${settings.id.hud_y} {
-      color: white;
+    
     }
     #${settings.id.hud_x} div,
     #${settings.id.hud_y} div {

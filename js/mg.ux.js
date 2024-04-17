@@ -143,8 +143,8 @@ mg.ux = (function() {
     let data = e.detail.data
     let hero = data.hero
     
-    hudX.innerHTML = hero.x
-    hudY.innerHTML = hero.y
+    hudX.innerHTML = Math.floor(hero.x)
+    hudY.innerHTML = Math.floor(hero.y)
   }
   
   let updateSector = function(e) {
@@ -165,12 +165,12 @@ mg.ux = (function() {
     js_point = new JoyStick(settings.controls.id_aim, settings.controls.js_aim_options, jsNotifyAim)
     
     // add the HUD
-    inject(`<div id="${settings.hud.id_hud}" class="absolute bottom-middle dev">
+    inject(`<div id="${settings.hud.id_hud}" class="absolute bottom-middle translucent-white backdrop-blur">
      <!-- HUD Coordinates -->
-     <div id="${settings.hud.id_x}" class="{$settings.hud.class_coords}"><div class="label">X</div><div class="value"></div></div>
-     <div id="${settings.hud.id_y}" class="${settings.hud.class_coords}"><div class="label">Y</div><div class="value"></div></div>
+     <div id="${settings.hud.id_x}" class="{$settings.hud.class_coords} text-grey"><div class="label">X</div><div class="value"></div></div>
+     <div id="${settings.hud.id_y}" class="${settings.hud.class_coords} text-grey"><div class="label">Y</div><div class="value"></div></div>
      <!-- HUD Sector -->
-     <div id="${settings.hud.id_sector}" class="${settings.hud.class_sector} absolute top-right light-grey"><div class="label">Sector:</div><div class="value"></div></div>
+     <div id="${settings.hud.id_sector}" class="${settings.hud.class_sector} absolute top-right text-grey"><div class="label">Sector:</div><div class="value"></div></div>
     </div>`)
     hudX      = qset(`#${settings.hud.id_x} .value`)
     hudY      = qset(`#${settings.hud.id_y} .value`)

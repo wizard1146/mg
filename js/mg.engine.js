@@ -15,7 +15,7 @@ mg.engine = (function() {
       size_unit    : 25,
       sizpu_sector : 40,
 
-      speed_limiter: 14,
+      speed_limiter: 9,
       speed_max    : 100,
     
       size_quadrant: 30000,
