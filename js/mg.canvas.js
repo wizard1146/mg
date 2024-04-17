@@ -48,6 +48,7 @@ mg.canvas = (function() {
   }
   /* Memory */
   let main, canvas, ctx, sf = 1, stageX = 0, stageY = 0;
+  let canvasWidth, canvasHeight;
   let data;
   let transform = {
     left: 0,
@@ -111,7 +112,10 @@ mg.canvas = (function() {
     canvas.style.width = wi + 'px'
     canvas.style.height = he + 'px'
 
-    adjustDPI()
+    let m = adjustDPI()
+    canvasWidth  = m[0]
+    canvasHeight = m[1]
+    console.log(`Canvas w x h: ${canvasWidth}, ${canvasHeight}`)
     
     // listen to canvas
     canvas.addEventListener( events.internal.canvas_mousemove, stageMove)
@@ -153,6 +157,8 @@ mg.canvas = (function() {
     ctx.setTransform( bs, 0, 0, bs, 0, 0 ) 
     ctx.drawImage( b, 0, 0 )
     ctx.setTransform( sf, 0, 0, sf, 0, 0 )
+    
+    return [canvas.width, canvas.height]
   }
   
   let stageMove = function(e) {
@@ -196,6 +202,21 @@ mg.canvas = (function() {
   }
   
   let renderGrid = function() {
+  /*
+     Pseudo-code
+       we only want to render to the edges of our screen
+       we want to know the offset of 
+   */
+    let h = data.hero
+    let c = Math.ceil(canvasWidth / data.settings.size_sector)
+    let deltaX = h.sector.left - h.x
+    let deltaY = h.sector.bottom - h.y
+    
+    // console.log(c, `${h.sector.left} - ${Math.floor(h.x)}: `, Math.floor(deltaX), `${h.sector.bottom} - ${Math.floor(h.y)}: `, Math.floor(deltaY))
+    
+    
+    
+  /*
     let L = data.limits
     let h = data.hero
     
@@ -219,6 +240,7 @@ mg.canvas = (function() {
       ctx.lineTo( hmax, Line)
       ctx.stroke()
     })
+    */
   }
 
   // Initialisation listener

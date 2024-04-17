@@ -45,7 +45,9 @@ mg.ux = (function() {
       id_hud      : 'mg-hud-main',
       id_x        : 'mg-hud-x',
       id_y        : 'mg-hud-y',
+      id_sector   : 'mg-hud-sector',
       class_coords: 'mg-hud-class-coords',
+      class_sector: 'mg-hud-class-sector',
     }
   }
   let events = {
@@ -76,7 +78,7 @@ mg.ux = (function() {
   /* Memory */
   let body, main, state, substate, showX, showY;
   let js_dir, js_aim;
-  let hudX, hudY;
+  let hudX, hudY, hudSector;
   
   /* Computational variables */
 
@@ -118,6 +120,7 @@ mg.ux = (function() {
     
     // Listen for Canvas Tick
     main.addEventListener( events.incoming.canvas_tick, updateCoordinates )
+    main.addEventListener( events.incoming.canvas_tick, updateSector      )
   }
 
   
@@ -144,6 +147,12 @@ mg.ux = (function() {
     hudY.innerHTML = hero.y
   }
   
+  let updateSector = function(e) {
+    let data = e.detail.data
+    let hero = data.hero
+    hudSector.innerHTML = `(${hero.sector.sx},${hero.sector.sy})<br/>${hero.sector.left},${hero.sector.bottom}`
+  }
+  
   /* Stage */
   let requestStage = function() {
   
@@ -157,11 +166,15 @@ mg.ux = (function() {
     
     // add the HUD
     inject(`<div id="${settings.hud.id_hud}" class="absolute bottom-middle dev">
+     <!-- HUD Coordinates -->
      <div id="${settings.hud.id_x}" class="{$settings.hud.class_coords}"><div class="label">X</div><div class="value"></div></div>
      <div id="${settings.hud.id_y}" class="${settings.hud.class_coords}"><div class="label">Y</div><div class="value"></div></div>
+     <!-- HUD Sector -->
+     <div id="${settings.hud.id_sector}" class="${settings.hud.class_sector} absolute top-right light-grey"><div class="label">Sector:</div><div class="value"></div></div>
     </div>`)
-    hudX = qset(`#${settings.hud.id_x} .value`)
-    hudY = qset(`#${settings.hud.id_y} .value`)
+    hudX      = qset(`#${settings.hud.id_x} .value`)
+    hudY      = qset(`#${settings.hud.id_y} .value`)
+    hudSector = qset(`#${settings.hud.id_sector} .value`)
   }
   
   /* Joystick interactions */

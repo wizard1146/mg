@@ -13,15 +13,18 @@ mg.engine = (function() {
     },
     game    : {
       size_unit    : 25,
-      sizpu_sector : 43,
+      sizpu_sector : 40,
 
       speed_limiter: 14,
       speed_max    : 100,
     
       size_quadrant: 30000,
       size_sector  :   500,
-      count_sector :    5,
+      count_sector :     5,
       count_stars  :   898,
+      
+      initial_x    : 0,
+      initial_y    : 0,
     }
   }
   let events = {
@@ -41,9 +44,10 @@ mg.engine = (function() {
   let body, main;
   // Main data output
   let data = {
-    hero   : {},
-    sectors: {},
-    limits : {}
+    hero    : {},
+    sectors : {},
+    limits  : {},
+    settings: {},
   }
   /* Computational variables */
   let collider;
@@ -88,8 +92,9 @@ mg.engine = (function() {
   /* Start function */
   let start = function() {
     // preform some calculations
-    settings.game.size_sector = settings.game.sizpu_sector * settings.game.size_unit / 2
+    settings.game.size_sector   = settings.game.sizpu_sector * settings.game.size_unit / 2
     settings.game.size_quadrant = settings.game.sizpu_sector * 5
+    console.log(`Initialised game with following settings: `, settings.game)
 
     // generate collider
     collider = new collisions.generate()
@@ -97,6 +102,8 @@ mg.engine = (function() {
     generateMap()
     // generate player
     generatePlayer()
+    // update the data package
+    data.settings.size_sector = settings.game.size_sector
     // 
     heartbeat()
   }
@@ -157,7 +164,7 @@ mg.engine = (function() {
     }
     if (changed) {
       // calculate new neighbours
-      
+      hero.sector = getSector(hero.x, hero.y)
     }
   }
   
@@ -208,30 +215,18 @@ mg.engine = (function() {
 
   let getSector = function(x,y) {
     const ss = settings.game.size_sector
-    let a = data.limits.hlims, b, c, d;
-    let e = data.limits.vlims, f, g, h;
 
-    // Walk Left to Right
-    for (var i = 0; i < a.length; i++) {
-      if (a[i] > x) { 
-        // get the midpoint
-        c = (b + a[i])/2
-        d = c/(ss*2)
-        break 
-      }
-      b = a[i]
-    }
-    // Walk Top to Bottom
-    for (var i = 0; i < e.length; i++) {
-      if (e[i] > y) { 
-        // get the midpoint
-        g = (f + e[i])/2
-        h = g/(ss*2)
-        break 
-      }
-      f = e[i]
-    }
-    return {sx: d, sy: h, left: c, bottom: g}
+    let k = function(input, sectorSize) { return Math.floor((input - sectorSize) / (2 * sectorSize)) + 1 }
+    let m = function(input, sectorSize) { return (2*input - 1) * sectorSize }
+
+    let mx     = k( x, ss )
+    let my     = k( y, ss )
+    let left   = m( mx, ss )
+    let right  = left + 2*ss - 1
+    let bottom = m( my, ss )
+    let top    = bottom + 2*ss - 1
+
+    return {sx: mx, sy: my, left: left, bottom: bottom, right: right, top: top}
   }
   
   let getTile = function(key) {
@@ -363,6 +358,7 @@ mg.engine = (function() {
   class Player extends Actor {
     constructor(key, options) {
       super(key, options)
+      this.sector = getSector( settings.game.initial_x, settings.game.initial_y )
     }
   }
   

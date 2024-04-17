@@ -16,6 +16,7 @@ mg.css = (function() {
     },
     joysticks: {
       size         : `50vmin`,
+      size_max     : `180px`,
     },
     hud      : {
       width        : `40%`,
@@ -120,6 +121,12 @@ mg.css = (function() {
       text-align: right;
     }
     `,
+    `
+    /* Colors */
+    .light-grey {
+      color   : rgba( 67, 67, 89, 1.00 );
+    }
+    `,
     ` 
     /* Core Elements */
     #mg-main, #mg-submain {
@@ -162,6 +169,8 @@ mg.css = (function() {
     #${settings.id.joystick_point} {
       width    : ${settings.joysticks.size};
       height   : ${settings.joysticks.size};
+      max-width : ${settings.joysticks.size_max};
+      max-height: ${settings.joysticks.size_max};
     }
     #${settings.id.joystick_dir},
     #${settings.id.joystick_point} {
