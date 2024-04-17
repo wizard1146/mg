@@ -64,6 +64,7 @@ mg.ux = (function() {
     outgoing: {
       injected_main    : `mgu-injected-main`,
       
+      engine_start     : `mgu-engine-start`,
       stage_start      : 'mgu-stage-start',
       state_change     : 'mgu-state-change',
       
@@ -108,7 +109,7 @@ mg.ux = (function() {
     // add listeners
     listen()
     
-    // SIMULATE: request a game level + canvas
+    // SIMULATE: request a game level + canvas -> change this to a menu UI when desiring control
     setTimeout(requestStage, 1000)
   }
   
@@ -127,7 +128,9 @@ mg.ux = (function() {
     
 
   let mainMenu = function() {
-  
+    inject(`
+      
+    `)
   }
   
   let swapState = function() {
@@ -155,9 +158,9 @@ mg.ux = (function() {
   
   /* Stage */
   let requestStage = function() {
-  
-    // request Canvas
-    raiseEvent( main, events.outgoing.stage_start )
+    // request Engine & Canvas
+    raiseEvent( main, events.outgoing.engine_start )
+    raiseEvent( main, events.outgoing.stage_start  )
     
     // add the joysticks
     inject(`<div id="${settings.controls.id_dir}" class="absolute bottom-left"></div><div id="${settings.controls.id_aim}" class="absolute bottom-right"></div>`)

@@ -100,6 +100,7 @@ mg.canvas = (function() {
   }
   
   let stageStart = function() {
+  console.log(3)
     let s = `center fullscreen`
     let c = `<canvas id="${settings.canvas.id}" class="${s}"></canvas>`
     

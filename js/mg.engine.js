@@ -31,6 +31,8 @@ mg.engine = (function() {
     incoming: {
       initialise    : 'mgc-initialise',
       injected_main : `mgu-injected-main`,
+      engine_start  : `mgu-engine-start`,
+      stage_start   : `mgu-stage-start`,
       
       input_key_movement     : 'mgi-input-key-movement',
       input_key_action       : 'mgi-input-key-action',
@@ -57,7 +59,11 @@ mg.engine = (function() {
   let initialise = function() {
     body = qset('body')
     
-    body.addEventListener( events.incoming.injected_main, function() { main = qset(`#${settings.app.id_tray}`); listen(); start(); } )
+    body.addEventListener( events.incoming.injected_main, function() { 
+      main = qset(`#${settings.app.id_tray}`); 
+      listen(); 
+      main.addEventListener( events.incoming.engine_start, start );
+      } )
   }
 
 /*
@@ -91,6 +97,7 @@ mg.engine = (function() {
   
   /* Start function */
   let start = function() {
+  console.log('a')
     // preform some calculations
     settings.game.size_sector   = settings.game.sizpu_sector * settings.game.size_unit / 2
     settings.game.size_quadrant = settings.game.sizpu_sector * 5
