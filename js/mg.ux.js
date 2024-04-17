@@ -78,7 +78,7 @@ mg.ux = (function() {
   /* Memory */
   let body, main, state, substate, showX, showY;
   let js_dir, js_aim;
-  let hudX, hudY, hudSector;
+  let jsDir, jsAim, hudX, hudY, hudSector;
   
   /* Computational variables */
 
@@ -150,7 +150,7 @@ mg.ux = (function() {
   let updateSector = function(e) {
     let data = e.detail.data
     let hero = data.hero
-    hudSector.innerHTML = `(${hero.sector.sx},${hero.sector.sy})<br/>${hero.sector.left},${hero.sector.bottom}`
+    hudSector.innerHTML = `(${hero.sector.sx},${hero.sector.sy})` // `<br/>${hero.sector.left},${hero.sector.bottom}`
   }
   
   /* Stage */
@@ -161,20 +161,30 @@ mg.ux = (function() {
     
     // add the joysticks
     inject(`<div id="${settings.controls.id_dir}" class="absolute bottom-left"></div><div id="${settings.controls.id_aim}" class="absolute bottom-right"></div>`)
-    js_dir   = new JoyStick(settings.controls.id_dir, settings.controls.js_dir_options, jsNotifyDir)
-    js_point = new JoyStick(settings.controls.id_aim, settings.controls.js_aim_options, jsNotifyAim)
+    jsDir   = new JoyStick(settings.controls.id_dir, settings.controls.js_dir_options, jsNotifyDir)
+    jsPoint = new JoyStick(settings.controls.id_aim, settings.controls.js_aim_options, jsNotifyAim)
     
     // add the HUD
-    inject(`<div id="${settings.hud.id_hud}" class="absolute bottom-middle translucent-white backdrop-blur">
+    inject(`<div id="${settings.hud.id_hud}" class="absolute fullscreen center no-pointer">
      <!-- HUD Coordinates -->
-     <div id="${settings.hud.id_x}" class="{$settings.hud.class_coords} text-grey"><div class="label">X</div><div class="value"></div></div>
-     <div id="${settings.hud.id_y}" class="${settings.hud.class_coords} text-grey"><div class="label">Y</div><div class="value"></div></div>
+     <div id="${settings.hud.id_x}" class="${settings.hud.class_coords} absolute syne-mono text-right text-grey bottom-left"><div class="label"></div><div class="value"></div></div>
+     <div id="${settings.hud.id_y}" class="${settings.hud.class_coords} absolute syne-mono text-right text-grey"><div class="label"></div><div class="value"></div></div>
      <!-- HUD Sector -->
-     <div id="${settings.hud.id_sector}" class="${settings.hud.class_sector} absolute top-right text-grey"><div class="label">Sector:</div><div class="value"></div></div>
+     <div id="${settings.hud.id_sector}" class="${settings.hud.class_sector} absolute circle top-left syne-mono text-center text-grey"><div class="label"></div><div class="value"></div></div>
     </div>`)
+    
+    // shorthands for performance
     hudX      = qset(`#${settings.hud.id_x} .value`)
     hudY      = qset(`#${settings.hud.id_y} .value`)
     hudSector = qset(`#${settings.hud.id_sector} .value`)
+    
+    // adjust the Coordinates
+    js_dir = qset(`#${settings.controls.id_dir}`)
+    js_aim = qset(`#${settings.controls.id_aim}`)
+    let hud_x = qset(`#${settings.hud.id_x}`)
+    let hud_y = qset(`#${settings.hud.id_y}`)
+    hud_y.style.bottom = js_dir.clientHeight
+    hud_x.style.setProperty('left', `calc(${js_dir.clientWidth}px - ${hud_x.clientWidth}px)`)
   }
   
   /* Joystick interactions */

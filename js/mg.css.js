@@ -19,8 +19,12 @@ mg.css = (function() {
       size_max     : `180px`,
     },
     hud      : {
-      width        : `40%`,
-      height       : `13vmin`,
+      width         : `40%`,
+      height        : `13vmin`,
+      coordXY_width : `calc(7ch + 4ch)`,
+      sector_size   : `11ch`,
+      sector_margin : `1.4ch`,
+      sector_opacity: `0.4`,
     },
     // ux
     
@@ -32,6 +36,7 @@ mg.css = (function() {
       hud_main         : 'mg-hud-main',
       hud_x            : 'mg-hud-x',
       hud_y            : 'mg-hud-y',
+      hud_sector       : 'mg-hud-sector',
       hud_coords_class : 'mg-hud-class-coords',
     },
   }
@@ -64,6 +69,17 @@ mg.css = (function() {
   }
   
   let cssRules = [
+    `
+    /* Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=M+PLUS+1+Code:wght@100..700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Syne+Mono&display=swap');
+    .mplus {
+      font-family: "M PLUS 1 Code", monospace;
+    }
+    .syne-mono {
+      font-family: "Syne Mono", monospace;
+    }
+    `,
     `
     :root {
       --app-background-color: ${settings.colors.appBackground};
@@ -117,8 +133,17 @@ mg.css = (function() {
       left     : 0%;
       bottom   : 0%;
     }
+    .text-center {
+      text-align: center;
+    }
     .text-right {
       text-align: right;
+    }
+    .no-pointer {
+      pointer-events: none;
+    }
+    .circle {
+      border-radius: 50%;
     }
     `,
     `
@@ -127,7 +152,7 @@ mg.css = (function() {
       background: rgba( 255, 255, 255, 0.04 );
     }
     .text-grey {
-      color   : rgba( 67, 67, 89, 1.00 );
+      color   : rgba( 141, 141, 189, 0.65 );
     }
     .backdrop-blur {
       backdrop-filter: blur(6px);
@@ -185,10 +210,13 @@ mg.css = (function() {
     
     /* HUD */
     #${settings.id.hud_main} {
-      width  : ${settings.hud.width};
-      height : ${settings.hud.height};
-      border-top-left-radius : 12px;
-      border-top-right-radius: 12px;
+    
+    }
+    #${settings.id.hud_x} {
+      width : ${settings.hud.coordXY_width};
+    }
+    #${settings.id.hud_y} {
+      width : ${settings.hud.coordXY_width};
     }
     #${settings.id.hud_x},
     #${settings.id.hud_y} {
@@ -204,6 +232,16 @@ mg.css = (function() {
     }
     .${settings.id.hud_coords_class} {
     
+    }
+    #${settings.id.hud_sector} {
+      margin : ${settings.hud.sector_margin};
+      width  : ${settings.hud.sector_size};
+      height : ${settings.hud.sector_size};
+      border : 1px dashed rgba( 141, 141, 169, 0.33 );
+      opacity: ${settings.hud.sector_opacity};
+    }
+    #${settings.id.hud_sector} .value {
+      line-height: calc(${settings.hud.sector_size} * 0.97);
     }
     `,
   ]
