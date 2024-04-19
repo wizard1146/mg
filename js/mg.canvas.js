@@ -22,6 +22,10 @@ mg.canvas = (function() {
         sprite_height: 294,
         sprite_ratio : 294 / 156,
         size: 24,
+        sprite_width : 256,
+        sprite_height: 256,
+        sprite_ratio : 256 / 256,
+        size: 256,
       },
       grid  : {
         style: `rgba( 133, 133, 167, 0.13 )`,
@@ -52,6 +56,11 @@ mg.canvas = (function() {
   let main, canvas, ctx, sf = 1, stageX = 0, stageY = 0;
   let canvasWidth, canvasHeight;
   let data;
+  let sprites = {
+    main: {
+
+    },
+  }
   let transform = {
     left: 0,
     top : 0,
@@ -91,6 +100,29 @@ mg.canvas = (function() {
     // set up main
     main = qset( `#${settings.app.id_tray}` )
 
+
+   // move this to stageStart in future
+   // initialise main sprites'
+   let idleKeys = {
+     /*
+    'idle_SW': 'Knight_Idle_dir1',
+    'idle_W' : 'Knight_Idle_dir2',
+    'idle_NW': 'Knight_Idle_dir3',
+    'idle_N' : 'Knight_Idle_dir4',
+    'idle_NE': 'Knight_Idle_dir5',
+    'idle_E' : 'Knight_Idle_dir6',
+    'idle_SE': 'Knight_Idle_dir7',
+    */
+    'idle_S' : 'Knight_Idle_dir8',
+   }
+   Object.entries(idleKeys).forEach(([k,v], i) => {
+     sprites.main[k] = new Image()
+     sprites.main[k].src = 'assets/knight/Idle/' + v + '.png'
+     sprites.main[k].onload = function() {
+       console.log(sprites)
+     }
+   })
+
     // document.querySelector('body').addEventListener( events.incoming.stage_start, (e) => { console.log(e)} )
     eventify()
   }
@@ -100,7 +132,6 @@ mg.canvas = (function() {
   }
   
   let stageStart = function() {
-  console.log(3)
     let s = `center fullscreen`
     let c = `<canvas id="${settings.canvas.id}" class="${s}"></canvas>`
     
@@ -183,7 +214,8 @@ mg.canvas = (function() {
     // Draw the background
     
     // Draw the hero
-    renderHero()
+    // renderHero()
+    renderHero2()
     
     // Draw the gridlines
     renderGrid()
@@ -201,6 +233,49 @@ mg.canvas = (function() {
     ctx.rotate( h.r )
     ctx.translate( -t/2, -t*r/2 )
     ctx.drawImage( hero, 0, 0, t, t*r )
+    ctx.restore()
+  }
+
+  let renderHero2 = function(state, frame) {
+    let h = data.hero
+    let t = settings.canvas.hero.size
+    let r = settings.canvas.hero.sprite_ratio
+    ctx.save()
+    ctx.translate( transform.left, transform.top )
+    // ctx.rotate( h.r )
+    ctx.translate( -t/2, -t*r/2 )
+    
+    // state is idle
+    // frame is ....
+
+    if (h.a.key == '') {
+      let animationList = [
+        [   0,   0,256,256],
+        [ 256,   0,256,256],
+        [ 512,   0,256,256],
+        [ 768,   0,256,256],
+        [1024,   0,256,256],
+        [   0, 256,256,256],
+        [ 256, 256,256,256],
+        [ 512, 256,256,256],
+        [ 768, 256,256,256],
+        [1024, 256,256,256],
+        [   0, 512,256,256],
+        [ 256, 512,256,256],
+        [ 512, 512,256,256],
+        [ 768, 512,256,256],
+        [1024, 512,256,256],
+        [   0, 768,256,256],
+        [ 256, 768,256,256],
+      ]
+      h.animateSet('idle', animationList, 15)
+    } 
+
+    let i = h.animateCount()
+    // console.log(i)
+
+    ctx.drawImage( sprites.main.idle_S, i[0], i[1], i[2], i[3], 0, 0, t, t*r ) 
+
     ctx.restore()
   }
   
