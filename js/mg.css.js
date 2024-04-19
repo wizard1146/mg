@@ -17,6 +17,9 @@ mg.css = (function() {
     joysticks: {
       size         : `50vmin`,
       size_max     : `180px`,
+      offset_bottom: `15px`,
+      offset_left  : `13px`,
+      offset_right : `24px`,
     },
     hud      : {
       width          : `40%`,
@@ -209,7 +212,13 @@ mg.css = (function() {
     }
     #${settings.id.joystick_dir},
     #${settings.id.joystick_point} {
-    
+      bottom   : ${settings.joysticks.offset_bottom};
+    }
+    #${settings.id.joystick_dir} {
+      left     : ${settings.joysticks.offset_left};
+    }
+    #${settings.id.joystick_point} {
+      right    : ${settings.joysticks.offset_right};
     }
     
     /* HUD */

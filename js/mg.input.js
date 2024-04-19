@@ -8,6 +8,9 @@ mg.input = (function() {
   
   /* Module Settings & Events */
   let settings = {
+    general : {
+      invert_y: true,
+    },
     keys    : {
       movement: ['w','a','s','d','W','A','S','D'],
       actions : ['p','l','P','L'],

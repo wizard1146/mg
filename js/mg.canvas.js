@@ -18,10 +18,16 @@ mg.canvas = (function() {
     canvas  : {
       id    : 'mg-canvas',
       hero  : {
+        /*
         sprite_width : 156,
         sprite_height: 294,
         sprite_ratio : 294 / 156,
         size: 24,
+        */
+        sprite_width : 256,
+        sprite_height: 256,
+        sprite_ratio : 256 / 256,
+        size: 256,
       },
       grid  : {
         style: `rgba( 133, 133, 167, 0.13 )`,
@@ -32,26 +38,33 @@ mg.canvas = (function() {
   }
   let events = {
     incoming: {
-      initialise  : 'mgc-initialise',
+      initialise    : 'mgc-initialise',
+      injected_main : `mgu-injected-main`,
       
       stage_start      : 'mgu-stage-start',
       state_change     : 'mgu-state-change',
+      stage_kill       : `mgu_stage_kill`,
     },
     internal: {
       canvas_tick      : 'mgc_tick',
       canvas_mousemove : 'mousemove',
     },
     outgoing: {
-      initialise  : 'mgc-initialise',
-      selfDestruct: 'mgc-self-destruct',
-      stage_move  : 'mgx-stage-move',
-      tick        : 'mgc-outgoing-tick',
+      initialise    : 'mgc-initialise',
+      selfDestruct  : 'mgc-self-destruct',
+      stage_move    : 'mgx-stage-move',
+      tick          : 'mgc-outgoing-tick',
     },
   }
   /* Memory */
-  let main, canvas, ctx, sf = 1, stageX = 0, stageY = 0;
+  let body, main, canvas, ctx, sf = 1, stageX = 0, stageY = 0;
   let canvasWidth, canvasHeight;
   let data;
+  let sprites = {
+    main: {
+
+    },
+  };
   let transform = {
     left: 0,
     top : 0,
@@ -61,7 +74,7 @@ mg.canvas = (function() {
   
   /* Loop control */
   let anim = {
-    stop: false,
+    stop : false,
     frame: 0,
     fps  : settings.fps,
     fpsi : 0,
@@ -70,12 +83,14 @@ mg.canvas = (function() {
     then : 0,
     gone : 0,  
     prep : function() {
+      anim.stop  = false
       anim.fpsi  = 1000 / anim.fps
       anim.then  = Date.now()
       anim.start = anim.then
       anim.loop()
     },
     loop : function() { 
+      if (anim.stop) { return }
       window.requestAnimationFrame( anim.loop )
       anim.now  = Date.now()
       anim.gone = anim.now - anim.then
@@ -84,23 +99,53 @@ mg.canvas = (function() {
         anim.frame++
         raiseEvent( canvas, events.internal.canvas_tick, anim.frame )
       }
-    }
+    },
+    cease : function() {
+      anim.stop = true
+    },
+    reset : function() {
+      anim.cease()
+      anim.frame = 0
+    },
   }
   
   let initialise = function() {
+    body = qset('body')
     // set up main
+    body.addEventListener( events.incoming.injected_main, function() {
+      main = qset(`#${settings.app.id_tray}`)
+      eventify()
+    } )
     main = qset( `#${settings.app.id_tray}` )
-
-    // document.querySelector('body').addEventListener( events.incoming.stage_start, (e) => { console.log(e)} )
     eventify()
+    
+    // Asset Loading
+    let idleKeys = {
+     'idle_SW': 'Knight_Idle_dir1',
+     'idle_W' : 'Knight_Idle_dir2',
+     'idle_NW': 'Knight_Idle_dir3',
+     'idle_N' : 'Knight_Idle_dir4',
+     'idle_NE': 'Knight_Idle_dir5',
+     'idle_E' : 'Knight_Idle_dir6',
+     'idle_SE': 'Knight_Idle_dir7',
+     'idle_S' : 'Knight_Idle_dir8',
+    }
+    Object.entries(idleKeys).forEach(([k,v], i) => {
+      sprites.main[k] = new Image()
+      sprites.main[k].src = 'assets/knight/Idle/' + v + '.png'
+      sprites.main[k].onload = function() {
+        console.log(sprites)
+      }
+    })
+    // document.querySelector('body').addEventListener( events.incoming.stage_start, (e) => { console.log(e)} )
   }
   
   let eventify = function() {
     main.addEventListener( events.incoming.stage_start, stageStart )
+    main.addEventListener( events.incoming.stage_kill , stageEnd   )
   }
   
   let stageStart = function() {
-  console.log(3)
     let s = `center fullscreen`
     let c = `<canvas id="${settings.canvas.id}" class="${s}"></canvas>`
     
@@ -135,6 +180,12 @@ mg.canvas = (function() {
     
     // start the loop
     anim.prep()
+  }
+  
+  let stageEnd = function() {
+    anim.reset()
+    canvas.remove()
+    canvas = undefined
   }
 
   // DPI
@@ -183,7 +234,8 @@ mg.canvas = (function() {
     // Draw the background
     
     // Draw the hero
-    renderHero()
+    // renderHero()
+    renderHero2()
     
     // Draw the gridlines
     renderGrid()
@@ -201,6 +253,58 @@ mg.canvas = (function() {
     ctx.rotate( h.r )
     ctx.translate( -t/2, -t*r/2 )
     ctx.drawImage( hero, 0, 0, t, t*r )
+    ctx.restore()
+  }
+  
+  let renderHero2 = function(state, frame) {
+    let h = data.hero
+    let t = settings.canvas.hero.size
+    let r = settings.canvas.hero.sprite_ratio
+    ctx.save()
+    ctx.translate( transform.left, transform.top )
+    // ctx.rotate( h.r )
+    ctx.translate( -t/2, -t*r/2 )
+    
+    /*
+    if moving - moveset
+    if ilde - idleset*/
+    
+    let prefix = ''
+    if (h.v.m !== 0) {
+      prefix = 'idle_'
+    } else if (h.v.m === 0) {
+      prefix = 'idle_'
+    }
+    let dir = prefix + (h.cardinal == 'C' ? 'S' : h.cardinal)
+
+    if (h.a.key == '' || (h.a.key != dir && h.cardinal != 'C')) {
+      let animationList = [
+        [   0,   0,256,256],
+        [ 256,   0,256,256],
+        [ 512,   0,256,256],
+        [ 768,   0,256,256],
+        [1024,   0,256,256],
+        [   0, 256,256,256],
+        [ 256, 256,256,256],
+        [ 512, 256,256,256],
+        [ 768, 256,256,256],
+        [1024, 256,256,256],
+        [   0, 512,256,256],
+        [ 256, 512,256,256],
+        [ 512, 512,256,256],
+        [ 768, 512,256,256],
+        [1024, 512,256,256],
+        [   0, 768,256,256],
+        [ 256, 768,256,256],
+      ]
+      h.animateSet(dir, animationList, 12)
+    } 
+
+    let i = h.animateCount()
+    // console.log(i)
+    
+    ctx.drawImage( sprites.main[dir], i[0], i[1], i[2], i[3], 0, 0, t, t*r ) 
+
     ctx.restore()
   }
   

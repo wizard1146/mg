@@ -42,12 +42,14 @@ mg.ux = (function() {
       }
     },
     hud: {
-      id_hud      : 'mg-hud-main',
-      id_x        : 'mg-hud-x',
-      id_y        : 'mg-hud-y',
-      id_sector   : 'mg-hud-sector',
-      class_coords: 'mg-hud-class-coords',
-      class_sector: 'mg-hud-class-sector',
+      id_hud         : 'mg-hud-main',
+      id_x           : 'mg-hud-x',
+      id_y           : 'mg-hud-y',
+      id_sector      : 'mg-hud-sector',
+      id_engine      : 'mg-hud-engine',
+      id_engineThrust: 'mg-hud-engine-thrust',
+      class_coords   : 'mg-hud-class-coords',
+      class_sector   : 'mg-hud-class-sector',
     }
   }
   let events = {
@@ -67,6 +69,7 @@ mg.ux = (function() {
       engine_start     : `mgu-engine-start`,
       stage_start      : 'mgu-stage-start',
       state_change     : 'mgu-state-change',
+      stage_kill       : `mgu_stage_kill`,
       
       joystick_dir: 'mgu-joystick-dir',
       joystick_aim: 'mgu-joystick-aim',
@@ -78,8 +81,8 @@ mg.ux = (function() {
   let SUBSTATE = { STORY: 0, CHARSHEET: 1, INVENTORY: 2 }
   /* Memory */
   let body, main, state, substate, showX, showY;
-  let js_dir, js_aim;
-  let jsDir, jsAim, hudX, hudY, hudSector;
+  let js_dir, js_aim, hud_main;
+  let jsDir, jsAim, hudX, hudY, hudSector, hudEngineThrust;
   
   /* Computational variables */
 
@@ -111,6 +114,7 @@ mg.ux = (function() {
     
     // SIMULATE: request a game level + canvas -> change this to a menu UI when desiring control
     setTimeout(requestStage, 1000)
+    // setTimeout(endStage, 8000)
   }
   
   let listen = function() {
@@ -120,12 +124,10 @@ mg.ux = (function() {
     main.addEventListener( events.incoming.stage_move, updateStageXY )
     
     // Listen for Canvas Tick
-    main.addEventListener( events.incoming.canvas_tick, updateCoordinates )
-    main.addEventListener( events.incoming.canvas_tick, updateSector      )
+    main.addEventListener( events.incoming.canvas_tick, canvasTick )
   }
 
   
-    
 
   let mainMenu = function() {
     inject(`
@@ -137,23 +139,31 @@ mg.ux = (function() {
     raiseEvent( events.outgoing.state_change )
   }
   
+  let canvasTick = function(e) {
+    let data = e.detail.data
+    let hero = data.hero
+    
+    updateCoordinates(hero)
+    updateSector(hero)
+    updateThrust(hero)
+  }
+  
   let updateStageXY = function(e) {
     showX.innerHTML = (e.detail[0].toFixed(1)).toString().padStart(6,' ')
     showY.innerHTML = (e.detail[1].toFixed(1)).toString().padStart(6,' ')
   }
   
-  let updateCoordinates = function(e) {
-    let data = e.detail.data
-    let hero = data.hero
-    
+  let updateCoordinates = function(hero) {
     hudX.innerHTML = Math.floor(hero.x)
     hudY.innerHTML = Math.floor(hero.y)
   }
   
-  let updateSector = function(e) {
-    let data = e.detail.data
-    let hero = data.hero
-    hudSector.innerHTML = `(${hero.sector.sx},${hero.sector.sy})` // `<br/>${hero.sector.left},${hero.sector.bottom}`
+  let updateSector = function(hero) {
+    hudSector.innerHTML = `(${hero.sector.sx},${hero.sector.sy})`
+  }
+  
+  let updateThrust = function(hero) {
+    hudEngineThrust.innerHTML = `current heading: ${hero.r.toFixed(3)}<br/>current rotational speed: ${hero.v.r.toFixed(3)}` // `<br/>applied rotational delta: ${hero.dv.r.toFixed(3)}<br/>`
   }
   
   /* Stage */
@@ -174,20 +184,52 @@ mg.ux = (function() {
      <div id="${settings.hud.id_y}" class="${settings.hud.class_coords} absolute syne-mono text-right text-grey"><div class="label"></div><div class="value"></div></div>
      <!-- HUD Sector -->
      <div id="${settings.hud.id_sector}" class="${settings.hud.class_sector} absolute circle top-left syne-mono text-center text-grey"><div class="label"></div><div class="value"></div></div>
+     <!-- HUD Engine -->
+     <div id="${settings.hud.id_engine}" class="">
+       <div id="${settings.hud.id_engineThrust}" class="absolute bottom-middle syne-mono text-grey"><div class="value"></div></div>
+     </div>
     </div>`)
     
     // shorthands for performance
     hudX      = qset(`#${settings.hud.id_x} .value`)
     hudY      = qset(`#${settings.hud.id_y} .value`)
     hudSector = qset(`#${settings.hud.id_sector} .value`)
+    hudEngineThrust = qset(`#${settings.hud.id_engineThrust} .value`)
     
     // adjust the Coordinates
-    js_dir = qset(`#${settings.controls.id_dir}`)
-    js_aim = qset(`#${settings.controls.id_aim}`)
-    let hud_x = qset(`#${settings.hud.id_x}`)
-    let hud_y = qset(`#${settings.hud.id_y}`)
+    js_dir   = qset(`#${settings.controls.id_dir}`)
+    js_aim   = qset(`#${settings.controls.id_aim}`)
+    hud_main = qset(`#${settings.hud.id_hud}`)
+    hud_x    = qset(`#${settings.hud.id_x}`)
+    hud_y    = qset(`#${settings.hud.id_y}`)
     hud_y.style.bottom = js_dir.clientHeight
     hud_x.style.setProperty('left', `calc(${js_dir.clientWidth}px - ${hud_x.clientWidth}px)`)
+  }
+  
+  let endStage = function() {
+    console.log(`Killing the stage.`)
+    
+    // Notify everyone
+    raiseEvent( main, events.outgoing.stage_kill )
+    
+    // Remove &
+    js_dir.remove()
+    js_aim.remove()
+    hud_x.remove()
+    hud_y.remove()
+    hud_main.remove()
+    
+    // Reset
+    js_dir   = undefined
+    js_aim   = undefined
+    hud_main = undefined
+    hud_x = undefined
+    hud_y = undefined
+    
+    // we remove main and reinject with state
+    main.remove()
+    main = undefined
+    setTimeout(function() { initialise() }, 8000 )
   }
   
   /* Joystick interactions */
