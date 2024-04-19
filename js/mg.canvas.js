@@ -121,18 +121,26 @@ mg.canvas = (function() {
     
     // Asset Loading
     let idleKeys = {
-     'idle_SW': 'Knight_Idle_dir1',
-     'idle_W' : 'Knight_Idle_dir2',
-     'idle_NW': 'Knight_Idle_dir3',
-     'idle_N' : 'Knight_Idle_dir4',
-     'idle_NE': 'Knight_Idle_dir5',
-     'idle_E' : 'Knight_Idle_dir6',
-     'idle_SE': 'Knight_Idle_dir7',
-     'idle_S' : 'Knight_Idle_dir8',
+     'walk_SW': 'Walk/Knight_Walk_dir1',
+     'walk_W' : 'Walk/Knight_Walk_dir2',
+     'walk_NW': 'Walk/Knight_Walk_dir3',
+     'walk_N' : 'Walk/Knight_Walk_dir4',
+     'walk_NE': 'Walk/Knight_Walk_dir5',
+     'walk_E' : 'Walk/Knight_Walk_dir6',
+     'walk_SE': 'Walk/Knight_Walk_dir7',
+     'walk_S' : 'Walk/Knight_Walk_dir8',
+     'idle_SW': 'Idle/Knight_Idle_dir1',
+     'idle_W' : 'Idle/Knight_Idle_dir2',
+     'idle_NW': 'Idle/Knight_Idle_dir3',
+     'idle_N' : 'Idle/Knight_Idle_dir4',
+     'idle_NE': 'Idle/Knight_Idle_dir5',
+     'idle_E' : 'Idle/Knight_Idle_dir6',
+     'idle_SE': 'Idle/Knight_Idle_dir7',
+     'idle_S' : 'Idle/Knight_Idle_dir8',
     }
     Object.entries(idleKeys).forEach(([k,v], i) => {
       sprites.main[k] = new Image()
-      sprites.main[k].src = 'assets/knight/Idle/' + v + '.png'
+      sprites.main[k].src = 'assets/knight/' + v + '.png'
       sprites.main[k].onload = function() {
         console.log(sprites)
       }
@@ -271,14 +279,17 @@ mg.canvas = (function() {
     
     let prefix = ''
     if (h.v.m !== 0) {
-      prefix = 'idle_'
+      prefix = 'walk_'
     } else if (h.v.m === 0) {
       prefix = 'idle_'
     }
-    let dir = prefix + (h.cardinal == 'C' ? 'S' : h.cardinal)
+    let dir  = prefix + (h.cardinal == 'C' ? 'S' : h.cardinal)
+    let freq = prefix == 'idle_' ? 12 : 4
 
     if (h.a.key == '' || (h.a.key != dir && h.cardinal != 'C')) {
-      let animationList = [
+      let animationList;
+      if (prefix == 'idle_') {
+        animationList = [
         [   0,   0,256,256],
         [ 256,   0,256,256],
         [ 512,   0,256,256],
@@ -296,8 +307,23 @@ mg.canvas = (function() {
         [1024, 512,256,256],
         [   0, 768,256,256],
         [ 256, 768,256,256],
-      ]
-      h.animateSet(dir, animationList, 12)
+        ]
+      } else if (prefix == 'walk_') {
+        animationList = [
+        [   0,   0,256,256],
+        [ 256,   0,256,256],
+        [ 512,   0,256,256],
+        [ 768,   0,256,256],
+        [   0, 256,256,256],
+        [ 256, 256,256,256],
+        [ 512, 256,256,256],
+        [ 768, 256,256,256],
+        [   0, 512,256,256],
+        [ 256, 512,256,256],
+        [ 512, 512,256,256],
+        ]
+      }
+      h.animateSet(dir, animationList, freq)
     } 
 
     let i = h.animateCount()
