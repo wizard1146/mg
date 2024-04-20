@@ -28,7 +28,7 @@ mg.canvas = (function() {
         sprite_width : 256,
         sprite_height: 256,
         sprite_ratio : 256 / 256,
-        size: 256,
+        size: 201,
       },
       grid  : {
         style: `rgba( 133, 133, 167, 0.13 )`,
@@ -247,14 +247,14 @@ mg.canvas = (function() {
     let anims  = assets.data()
     let clas   = 'knight'
     let s      = h.v.m !== 0 ? 'walk' : 'idle'
-    let point  = h.cardinal == 'C' ? 'S' : h.cardinal
+    let point  = h.cardinal == 'C' ? (h.a.cardinal == 'C' ? 'S' : h.a.cardinal) : h.cardinal
     let freq   = s == 'idle' ? 12 : 4
     let key    = s + '_' + point
     
     let m      = anims[clas][s][key]
     
     // Set a new animation set
-    if (h.a.key == '' || (h.a.key != key && h.cardinal != 'C')) {
+    if (h.a.key == '' || (h.a.key != key)) { // && h.cardinal != 'C'
       h.animateSet(key, m.animation, freq)
     }
     let i = h.animateCount()

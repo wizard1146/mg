@@ -115,7 +115,7 @@ mg.engine = (function() {
     
     // Update hero rotation
     data.hero.r = datum.r
-    data.hero.cardinal = datum.c
+    data.hero.cardinal = datum.c == 'C' ? data.hero.cardinal : datum.c
   }
   
   /* Update Functions */

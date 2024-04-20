@@ -37,6 +37,7 @@ mg.constructs = (function() {
           count :  0,
           frame :  0,
           list  : [],
+          cardinal: 'N',
         },
         invert_animation: false,
       }
@@ -56,6 +57,7 @@ mg.constructs = (function() {
         count : 0,
         frame : 0,
         list  : list,
+        cardinal: this.cardinal,
       }
     }
     animateCount() {

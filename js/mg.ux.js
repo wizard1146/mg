@@ -149,6 +149,7 @@ mg.ux = (function() {
     
     // show FPS
     hudFPS.innerHTML = mg?.canvas?.fps().toFixed(1)
+    // hudFPS.innerHTML = hero.a.key + ',' + hero.a.cardinal
     
     updateCoordinates(hero)
     updateSector(hero)

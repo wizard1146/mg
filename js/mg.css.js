@@ -35,6 +35,7 @@ mg.css = (function() {
     // IDs
     id: {
       canvas_id_xy     : 'mgx-xy',
+      canvas_id_fps    : 'mgx-fps',
       joystick_dir     : 'mg-joystick-dir',
       joystick_point   : 'mg-joystick-aim',
       hud_main         : 'mg-hud-main',
@@ -167,6 +168,10 @@ mg.css = (function() {
     `,
     ` 
     /* Core Elements */
+    #${settings.id.canvas_id_fps} {
+      right: 13px;
+      top  : 13px;
+    }
     #mg-main, #mg-submain {
       position: absolute;
       left    : 0%;
