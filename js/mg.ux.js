@@ -4,7 +4,7 @@ mg.ux = (function() {
   /* Meta variables */
   let qset       = mg.utilities.qselect
   let raiseEvent = mg.utilities.raiseEvent
-  let inject     = function(str) { body.insertAdjacentHTML('beforeend', str) }
+  let inject     = function(str, tar) { let t = tar ? tar : body; t.insertAdjacentHTML('beforeend', str) }
   
   /* Module Settings & Events */
   let settings = {
@@ -21,6 +21,7 @@ mg.ux = (function() {
     canvas  : {
       show_xy   : 'mgx-show-xy',
       id_xy     : 'mgx-xy',
+      id_fps    : 'mgx-fps',
     },
     controls: {
       id_dir    : 'mg-joystick-dir',
@@ -80,9 +81,9 @@ mg.ux = (function() {
   let STATE    = { SPLASH: 0, MAINMENU: 1, CREATOR: 2, GAME: 3, SKILLTREE: 4 }
   let SUBSTATE = { STORY: 0, CHARSHEET: 1, INVENTORY: 2 }
   /* Memory */
-  let body, main, state, substate, showX, showY;
+  let body, main, submain, state, substate, showX, showY;
   let js_dir, js_aim, hud_main;
-  let jsDir, jsAim, hudX, hudY, hudSector, hudEngineThrust;
+  let jsDir, jsAim, hudX, hudY, hudSector, hudEngineThrust, hudFPS;
   
   /* Computational variables */
 
@@ -100,12 +101,15 @@ mg.ux = (function() {
            <div id="${settings.canvas.id_xy}-X" class="hidden relative"><div id="${settings.canvas.id_xy}-X-label">X</div><div id="${settings.canvas.id_xy}-X-value" class="absolute right text-right"></div></div>
            <div id="${settings.canvas.id_xy}-Y" class="hidden relative"><div id="${settings.canvas.id_xy}-Y-label">Y</div><div id="${settings.canvas.id_xy}-Y-value" class="absolute right text-right"></div></div>
          </div>
+         <div id="${settings.canvas.id_fps}" class="absolute top-right"><div class="value syne-mono text-grey"></div></div>
        </div>
      </div>`)
     // assign main
-    main  = qset( `#${settings.app.id_tray}` )
-    showX = qset( `#${settings.canvas.id_xy}-X-value`)
-    showY = qset( `#${settings.canvas.id_xy}-Y-value`)
+    main    = qset(`#${settings.app.id_tray}`)
+    submain = qset(`#${settings.app.id_subtray}`)
+    showX   = qset(`#${settings.canvas.id_xy}-X-value`)
+    showY   = qset(`#${settings.canvas.id_xy}-Y-value`)
+    hudFPS  = qset(`#${settings.canvas.id_fps} .value`)
     // inform modules
     raiseEvent( body, events.outgoing.injected_main )
     
@@ -143,6 +147,9 @@ mg.ux = (function() {
     let data = e.detail.data
     let hero = data.hero
     
+    // show FPS
+    hudFPS.innerHTML = mg?.canvas?.fps().toFixed(1)
+    
     updateCoordinates(hero)
     updateSector(hero)
     updateThrust(hero)
@@ -173,7 +180,7 @@ mg.ux = (function() {
     raiseEvent( main, events.outgoing.stage_start  )
     
     // add the joysticks
-    inject(`<div id="${settings.controls.id_dir}" class="absolute bottom-left"></div><div id="${settings.controls.id_aim}" class="absolute bottom-right"></div>`)
+    inject(`<div id="${settings.controls.id_dir}" class="absolute bottom-left"></div><div id="${settings.controls.id_aim}" class="absolute bottom-right"></div>`, submain)
     jsDir   = new JoyStick(settings.controls.id_dir, settings.controls.js_dir_options, jsNotifyDir)
     jsPoint = new JoyStick(settings.controls.id_aim, settings.controls.js_aim_options, jsNotifyAim)
     
@@ -188,7 +195,7 @@ mg.ux = (function() {
      <div id="${settings.hud.id_engine}" class="">
        <div id="${settings.hud.id_engineThrust}" class="absolute bottom-middle syne-mono text-grey"><div class="value"></div></div>
      </div>
-    </div>`)
+    </div>`, submain)
     
     // shorthands for performance
     hudX      = qset(`#${settings.hud.id_x} .value`)

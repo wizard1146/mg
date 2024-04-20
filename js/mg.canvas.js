@@ -6,7 +6,7 @@ mg.canvas = (function() {
   let raiseEvent = mg.utilities.raiseEvent
   let engine     = mg.engine
   let assets     = mg.assets
-  let inject     = function(str) { body.insertAdjacentHTML('beforeend', str) }
+  let inject     = function(str, tar) { var t = tar ? tar : body; t.insertAdjacentHTML('beforeend', str) }
   
   /* Module Settings & Events */
   let settings = {
@@ -58,7 +58,7 @@ mg.canvas = (function() {
     },
   }
   /* Memory */
-  let body, main, canvas, ctx, sf = 1, stageX = 0, stageY = 0;
+  let body, main, submain, canvas, ctx, sf = 1, stageX = 0, stageY = 0;
   let canvasWidth, canvasHeight;
   let data;
   let sprites = {
@@ -108,16 +108,21 @@ mg.canvas = (function() {
       anim.cease()
       anim.frame = 0
     },
+    rates: function() { return 1000 * anim.frame/(anim.now - anim.start) },
   }
   
   let initialise = function() {
     body = qset('body')
     // set up main
     body.addEventListener( events.incoming.injected_main, function() {
-      main = qset(`#${settings.app.id_tray}`)
+      main    = qset(`#${settings.app.id_tray}`)
+      submain = qset(`#${settings.app.id_subtray}`)
       eventify()
     } )
-    main = qset( `#${settings.app.id_tray}` )
+    
+    main    = qset(`#${settings.app.id_tray}`)
+    submain = qset(`#${settings.app.id_subtray}`)
+    
     eventify()
     
     // Asset Loading
@@ -134,7 +139,7 @@ mg.canvas = (function() {
     let c = `<canvas id="${settings.canvas.id}" class="${s}"></canvas>`
     
     // add the canvas
-    main.insertAdjacentHTML('beforeend', c)
+    inject(c, submain)
     
     canvas = qset(`#${settings.canvas.id}`)
     ctx    = canvas.getContext('2d')
@@ -297,6 +302,7 @@ mg.canvas = (function() {
   
   return {
     init: initialise,
+    fps : anim.rates,
   }
 })()
 
