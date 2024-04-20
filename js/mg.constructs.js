@@ -32,12 +32,13 @@ mg.constructs = (function() {
         r: 0,
         cardinal: 'N',
         a: {
-          key  : '',
-          freq :  1,
-          count:  0,
-          frame:  0,
-          list : [],
+          key   : '',
+          freq  :  1,
+          count :  0,
+          frame :  0,
+          list  : [],
         },
+        invert_animation: false,
       }
       Object.entries(args).forEach(([k,v],i) => {
         if (options && options[k]) {
@@ -50,18 +51,22 @@ mg.constructs = (function() {
     /* Animation Controllers */
     animateSet(key, list, freq) {
       this.a = {
-        key  : key,
-        freq : freq,
-        count: 0,
-        frame: 0,
-        list : list,
+        key   : key,
+        freq  : freq,
+        count : 0,
+        frame : 0,
+        list  : list,
       }
     }
     animateCount() {
       this.a.count++
       if (this.a.count !== 0 && this.a.count % this.a.freq == 0) {
         this.a.count = 0
-        this.animateFrame()
+        if (this.invert_animation) { 
+          this.animateInverse() 
+        } else {
+          this.animateFrame()
+        }
       }
       return this.a.list[this.a.frame]
     }
@@ -69,6 +74,12 @@ mg.constructs = (function() {
       this.a.frame++
       if (this.a.frame >= this.a.list.length) {
         this.a.frame = 0
+      }
+    }
+    animateInverse() {
+      this.a.frame--
+      if (this.a.frame < 0) {
+        this.a.frame = this.a.list.length - 1
       }
     }
   }

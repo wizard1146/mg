@@ -5,6 +5,7 @@ mg.canvas = (function() {
   let qset       = mg.utilities.qselect
   let raiseEvent = mg.utilities.raiseEvent
   let engine     = mg.engine
+  let assets     = mg.assets
   let inject     = function(str) { body.insertAdjacentHTML('beforeend', str) }
   
   /* Module Settings & Events */
@@ -120,32 +121,7 @@ mg.canvas = (function() {
     eventify()
     
     // Asset Loading
-    let idleKeys = {
-     'walk_SW': 'Walk/Knight_Walk_dir1',
-     'walk_W' : 'Walk/Knight_Walk_dir2',
-     'walk_NW': 'Walk/Knight_Walk_dir3',
-     'walk_N' : 'Walk/Knight_Walk_dir4',
-     'walk_NE': 'Walk/Knight_Walk_dir5',
-     'walk_E' : 'Walk/Knight_Walk_dir6',
-     'walk_SE': 'Walk/Knight_Walk_dir7',
-     'walk_S' : 'Walk/Knight_Walk_dir8',
-     'idle_SW': 'Idle/Knight_Idle_dir1',
-     'idle_W' : 'Idle/Knight_Idle_dir2',
-     'idle_NW': 'Idle/Knight_Idle_dir3',
-     'idle_N' : 'Idle/Knight_Idle_dir4',
-     'idle_NE': 'Idle/Knight_Idle_dir5',
-     'idle_E' : 'Idle/Knight_Idle_dir6',
-     'idle_SE': 'Idle/Knight_Idle_dir7',
-     'idle_S' : 'Idle/Knight_Idle_dir8',
-    }
-    Object.entries(idleKeys).forEach(([k,v], i) => {
-      sprites.main[k] = new Image()
-      sprites.main[k].src = 'assets/knight/' + v + '.png'
-      sprites.main[k].onload = function() {
-        console.log(sprites)
-      }
-    })
-    // document.querySelector('body').addEventListener( events.incoming.stage_start, (e) => { console.log(e)} )
+    assets.load()
   }
   
   let eventify = function() {
@@ -252,17 +228,6 @@ mg.canvas = (function() {
     raiseEvent( main, events.outgoing.tick, {data: data, frames: e.detail} )
   }
   
-  let renderHero = function() {
-    let h = data.hero
-    let t = settings.canvas.hero.size
-    let r = settings.canvas.hero.sprite_ratio
-    ctx.save()
-    ctx.translate( transform.left, transform.top )
-    ctx.rotate( h.r )
-    ctx.translate( -t/2, -t*r/2 )
-    ctx.drawImage( hero, 0, 0, t, t*r )
-    ctx.restore()
-  }
   
   let renderHero2 = function(state, frame) {
     let h = data.hero
@@ -273,64 +238,22 @@ mg.canvas = (function() {
     // ctx.rotate( h.r )
     ctx.translate( -t/2, -t*r/2 )
     
-    /*
-    if moving - moveset
-    if ilde - idleset*/
+    // Animation
+    let anims  = assets.data()
+    let clas   = 'knight'
+    let s      = h.v.m !== 0 ? 'walk' : 'idle'
+    let point  = h.cardinal == 'C' ? 'S' : h.cardinal
+    let freq   = s == 'idle' ? 12 : 4
+    let key    = s + '_' + point
     
-    let prefix = ''
-    if (h.v.m !== 0) {
-      prefix = 'walk_'
-    } else if (h.v.m === 0) {
-      prefix = 'idle_'
+    let m      = anims[clas][s][key]
+    
+    // Set a new animation set
+    if (h.a.key == '' || (h.a.key != key && h.cardinal != 'C')) {
+      h.animateSet(key, m.animation, freq)
     }
-    let dir  = prefix + (h.cardinal == 'C' ? 'S' : h.cardinal)
-    let freq = prefix == 'idle_' ? 12 : 4
-
-    if (h.a.key == '' || (h.a.key != dir && h.cardinal != 'C')) {
-      let animationList;
-      if (prefix == 'idle_') {
-        animationList = [
-        [   0,   0,256,256],
-        [ 256,   0,256,256],
-        [ 512,   0,256,256],
-        [ 768,   0,256,256],
-        [1024,   0,256,256],
-        [   0, 256,256,256],
-        [ 256, 256,256,256],
-        [ 512, 256,256,256],
-        [ 768, 256,256,256],
-        [1024, 256,256,256],
-        [   0, 512,256,256],
-        [ 256, 512,256,256],
-        [ 512, 512,256,256],
-        [ 768, 512,256,256],
-        [1024, 512,256,256],
-        [   0, 768,256,256],
-        [ 256, 768,256,256],
-        ]
-      } else if (prefix == 'walk_') {
-        animationList = [
-        [   0,   0,256,256],
-        [ 256,   0,256,256],
-        [ 512,   0,256,256],
-        [ 768,   0,256,256],
-        [   0, 256,256,256],
-        [ 256, 256,256,256],
-        [ 512, 256,256,256],
-        [ 768, 256,256,256],
-        [   0, 512,256,256],
-        [ 256, 512,256,256],
-        [ 512, 512,256,256],
-        ]
-      }
-      h.animateSet(dir, animationList, freq)
-    } 
-
     let i = h.animateCount()
-    // console.log(i)
-    
-    ctx.drawImage( sprites.main[dir], i[0], i[1], i[2], i[3], 0, 0, t, t*r ) 
-
+    ctx.drawImage( m.img, i[0], i[1], i[2], i[3], 0, 0, t, t*r ) 
     ctx.restore()
   }
   
@@ -376,3 +299,103 @@ mg.canvas = (function() {
     init: initialise,
   }
 })()
+
+
+    
+    /*
+  let renderHero = function() {
+    let h = data.hero
+    let t = settings.canvas.hero.size
+    let r = settings.canvas.hero.sprite_ratio
+    ctx.save()
+    ctx.translate( transform.left, transform.top )
+    ctx.rotate( h.r )
+    ctx.translate( -t/2, -t*r/2 )
+    ctx.drawImage( hero, 0, 0, t, t*r )
+    ctx.restore()
+  }
+  
+    let prefix = ''
+    if (h.v.m !== 0) {
+      prefix = 'walk_'
+    } else if (h.v.m === 0) {
+      prefix = 'idle_'
+    }
+    let dir  = prefix + (h.cardinal == 'C' ? 'S' : h.cardinal)
+    let freq = prefix == 'idle_' ? 12 : 4
+
+    if (h.a.key == '' || (h.a.key != dir && h.cardinal != 'C')) {
+      let animationList;
+      if (prefix == 'idle_') {
+        
+        animationList = [
+        [   0,   0,256,256],
+        [ 256,   0,256,256],
+        [ 512,   0,256,256],
+        [ 768,   0,256,256],
+        [1024,   0,256,256],
+        [   0, 256,256,256],
+        [ 256, 256,256,256],
+        [ 512, 256,256,256],
+        [ 768, 256,256,256],
+        [1024, 256,256,256],
+        [   0, 512,256,256],
+        [ 256, 512,256,256],
+        [ 512, 512,256,256],
+        [ 768, 512,256,256],
+        [1024, 512,256,256],
+        [   0, 768,256,256],
+        [ 256, 768,256,256],
+        ]
+      } else if (prefix == 'walk_') {
+        animationList = [
+        [   0,   0,256,256],
+        [ 256,   0,256,256],
+        [ 512,   0,256,256],
+        [ 768,   0,256,256],
+        [   0, 256,256,256],
+        [ 256, 256,256,256],
+        [ 512, 256,256,256],
+        [ 768, 256,256,256],
+        [   0, 512,256,256],
+        [ 256, 512,256,256],
+        [ 512, 512,256,256],
+        ]
+      }
+      h.animateSet(dir, animationList, freq)
+    } 
+    let i = h.animateCount()
+    // console.log(i)
+    
+    ctx.drawImage( sprites.main[dir], i[0], i[1], i[2], i[3], 0, 0, t, t*r ) 
+    */
+
+    /*
+    
+    let idleKeys = {
+     'walk_SW': 'Walk/Knight_Walk_dir1',
+     'walk_W' : 'Walk/Knight_Walk_dir2',
+     'walk_NW': 'Walk/Knight_Walk_dir3',
+     'walk_N' : 'Walk/Knight_Walk_dir4',
+     'walk_NE': 'Walk/Knight_Walk_dir5',
+     'walk_E' : 'Walk/Knight_Walk_dir6',
+     'walk_SE': 'Walk/Knight_Walk_dir7',
+     'walk_S' : 'Walk/Knight_Walk_dir8',
+     'idle_SW': 'Idle/Knight_Idle_dir1',
+     'idle_W' : 'Idle/Knight_Idle_dir2',
+     'idle_NW': 'Idle/Knight_Idle_dir3',
+     'idle_N' : 'Idle/Knight_Idle_dir4',
+     'idle_NE': 'Idle/Knight_Idle_dir5',
+     'idle_E' : 'Idle/Knight_Idle_dir6',
+     'idle_SE': 'Idle/Knight_Idle_dir7',
+     'idle_S' : 'Idle/Knight_Idle_dir8',
+    }
+    Object.entries(idleKeys).forEach(([k,v], i) => {
+      sprites.main[k] = new Image()
+      sprites.main[k].src = 'assets/knight/' + v + '.png'
+      sprites.main[k].onload = function() {
+        console.log(sprites)
+      }
+    })
+    */
+    // document.querySelector('body').addEventListener( events.incoming.stage_start, (e) => { console.log(e)} )

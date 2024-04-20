@@ -18,6 +18,7 @@ mg.engine = (function() {
       sizpu_sector : 40,
 
       speed_limiter: 14,
+      speed_inverse_factor: 1.16,
       speed_max    : 100,
     
       size_quadrant: 30000,
@@ -123,13 +124,19 @@ mg.engine = (function() {
     let changed = false
     
     // add velocity
-    let magnitude = hero.v.m
-    let rotation  = hero.v.r
+    let limiter  = settings.game.speed_limiter
+    let diff     = Math.abs(hero.r - hero.v.r)
+    
+    if (diff > Math.PI/2) { 
+      hero.invert_animation = true; 
+      limiter = settings.game.speed_inverse_factor * limiter 
+    } else {
+      hero.invert_animation = false;
+    }
     
     // apply delta
-    
-    hero.deltaX = hero.v.x / settings.game.speed_limiter
-    hero.deltaY = hero.v.y / settings.game.speed_limiter
+    hero.deltaX = hero.v.x / limiter
+    hero.deltaY = hero.v.y / limiter
     hero.deltaRotation = Math.min( (hero.v.r), settings.game.limit_rotation )
     
     // resolve deltas

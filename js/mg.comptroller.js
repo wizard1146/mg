@@ -27,6 +27,7 @@ mg.comptroller = (function() {
       'constructs',
       'css',
       'data',
+      'assets',
       'db',
       'engine',
       'ux',
