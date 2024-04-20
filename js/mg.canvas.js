@@ -86,14 +86,14 @@ mg.canvas = (function() {
     prep : function() {
       anim.stop  = false
       anim.fpsi  = 1000 / anim.fps
-      anim.then  = Date.now()
+      anim.then  = performance.now()
       anim.start = anim.then
       anim.loop()
     },
     loop : function() { 
       if (anim.stop) { return }
       window.requestAnimationFrame( anim.loop )
-      anim.now  = Date.now()
+      anim.now  = performance.now()
       anim.gone = anim.now - anim.then
       if (anim.gone > anim.fpsi) { 
         anim.then = anim.now - (anim.gone % anim.fpsi) 
