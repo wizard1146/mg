@@ -1,0 +1,8 @@
+Model Information:
+* title:	Azure Sentine
+* source:	https://sketchfab.com/3d-models/azure-sentine-e20a9b180d544b0695ea066dc5365498
+* author:	Luna (https://sketchfab.com/StudioLuna)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works

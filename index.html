@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <title></title>
+  <style>
+    html, body {
+      overflow: hidden;
+      width   : 100%;
+      height  : 100%;
+      margin  : 0;
+      padding : 0;
+    }
+    #renderCanvas {
+      width : 100%;
+      height: 100%;
+      touch-action: none;
+    }
+  </style>
+  <script src="https://cdn.babylonjs.com/babylon.js"></script>
+  <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+  <script src="mg3.babylon.js"></script>
+</head>
+<body>
+  <canvas id="renderCanvas"></canvas>
+</body>
+<script>
+let scene;
+
+let list = [
+  {lvl:  1, scale:   1.0, key: 'hiro',       uri: 'blind_ronin'},
+  {lvl:  2, scale:   1.0, key: 'mira',       uri: 'arachy'},
+  {lvl:  3, scale: 125.0, key: 'thalendir',  uri: 'thalendir_the_horned_sentinel'},
+  {lvl:  3, scale:   1.0, key: 'saya',       uri: 'carbon_saya'},
+  {lvl:  4, scale: 125.0, key: 'sentinel',   uri: 'azure_sentine'},
+  {lvl:  5, scale:   1.0, key: 'bearsnake',  uri: 'lizard_head'},
+  {lvl:  6, scale:   1.0, key: 'medusa',     uri: 'medusa_shield'},
+  {lvl:  7, scale:   1.0, key: 'elf',        uri: 'silvanus_hunter_of_eyeblights'},
+  {lvl:  8, scale:   1.0, key: 'valerian',   uri: 'valerian_queen'},
+  {lvl:  9, scale:   1.0, key: 'kinoichi',   uri: 'kinoichi'},
+  {lvl: 10, scale:   1.0, key: 'illuminaty', uri: 'illuminaty'},
+  {lvl: 11, scale:   1.0, key: 'attod',      uri: 'hell_face_naginata'},
+  {lvl: 12, scale:   1.0, key: 'pendragon',  uri: 'troll_mud'},
+  {lvl: 12, scale:   1.0, key: 'helion',     uri: 'jungle_elves'},
+]
+		
+document.addEventListener("DOMContentLoaded", async function(event) {
+  mg3.engine.setup()
+  scene = await mg3.engine.defaultScene()
+
+  console.log(list)
+
+  let model = list[4]
+
+  mg3.engine.loadModel( `assets/${model.uri}/scene.gltf`, model )
+})
+
+</script>
+</html>
